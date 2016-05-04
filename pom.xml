@@ -4,11 +4,41 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <artifactId>oss-parent</artifactId>
+        <groupId>org.sonatype.oss</groupId>
+        <version>9</version>
+    </parent>
+
     <groupId>simple</groupId>
     <artifactId>rest.factory</artifactId>
     <version>0.1-SNAPSHOT</version>
 
+    <name>Simple Rest Factory</name>
     <description>Simple rest client-server factory, you give it a url, it does the rest!</description>
+    <url>https://github.com/tcurrie/rest-factory</url>
+
+    <inceptionYear>2016</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Todd Currie</name>
+            <email>tcurrie@cobaltgroup.com</email>
+            <roles>
+                <role>Maintainer</role>
+                <role>Developer</role>
+            </roles>
+            <timezone>-8</timezone>
+        </developer>
+    </developers>
 
     <scm>
         <connection>scm:git:git://github.com/tcurrie/rest-factory.git</connection>
