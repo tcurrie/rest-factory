@@ -2,19 +2,12 @@ package simple.rest.factory;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.BDDMockito;
 import org.mockito.Matchers;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.Mockito;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static simple.rest.factory.RestUriFactory.lowerHyphenate;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(RestUriFactory.class)
 public class RestUriFactoryTest {
     @Test
     public void testLowerAndHyphenate() {
@@ -33,7 +26,7 @@ public class RestUriFactoryTest {
                 .put("a_bC", "a-b-c")
                 .put("_aB", "a-b")
                 .put("aB_", "a-b")
-                .build().entrySet().forEach(e->assertThat(e.getKey(), lowerHyphenate(e.getKey()), is(e.getValue())));
+                .build().entrySet().forEach(e->assertThat(e.getKey(), RestUriFactory.getInstance().lowerHyphenate(e.getKey()), is(e.getValue())));
     }
 
     @Test
@@ -53,11 +46,13 @@ public class RestUriFactoryTest {
     }
 
     private void assertVersionForParentPart(final String parentPart, final String expected) {
-        PowerMockito.mockStatic(RestUriFactory.class);
-        BDDMockito.given(RestUriFactory.getVersion(Matchers.any())).willCallRealMethod();
-        BDDMockito.given(RestUriFactory.getCanonicalPart(Matchers.eq(RestUriFactory.class), Matchers.eq(-2))).willReturn(parentPart);
+        final RestUriFactory mockFactory = Mockito.mock(RestUriFactory.class);
 
-        final String actual = RestUriFactory.getVersion(RestUriFactory.class);
+
+        Mockito.doCallRealMethod().when(mockFactory).getVersion(Matchers.any());
+        Mockito.when(mockFactory.getCanonicalPart(Matchers.eq(RestUriFactory.class), Matchers.eq(-2))).thenReturn(parentPart);
+
+        final String actual = mockFactory.getVersion(RestUriFactory.class);
 
         assertThat(parentPart, actual, is(expected));
     }

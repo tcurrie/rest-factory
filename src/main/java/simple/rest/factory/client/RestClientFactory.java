@@ -40,7 +40,7 @@ public final class RestClientFactory {
     }
 
     private static <T> Supplier<String> createMethodUrlSupplier(final Supplier<String> urlSupplier, final Class<T> service, final Method method) {
-        final String methodUri = RestUriFactory.create(service, method);
+        final String methodUri = RestUriFactory.getInstance().create(service, method);
         return () -> removeSlash(urlSupplier.get()) + methodUri;
     }
 
