@@ -46,6 +46,7 @@ public class RestUriFactoryTest {
         );
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testCreateInterfaceVersionMethodUri() throws NoSuchMethodException {
         final Class type = RestUriFactoryTest.class;
