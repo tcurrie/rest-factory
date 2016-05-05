@@ -1,4 +1,4 @@
-package simple.rest.factory.service;
+package com.github.tcurrie.rest.factory.service;
 
 import java.util.List;
 

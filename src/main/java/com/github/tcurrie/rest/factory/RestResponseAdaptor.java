@@ -1,4 +1,4 @@
-package simple.rest.factory;
+package com.github.tcurrie.rest.factory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

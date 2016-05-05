@@ -1,8 +1,8 @@
-package simple.rest.factory.client;
+package com.github.tcurrie.rest.factory.client;
 
+import com.github.tcurrie.rest.factory.RestParameterAdaptor;
 import org.springframework.web.client.RestTemplate;
-import simple.rest.factory.RestParameterAdaptor;
-import simple.rest.factory.RestUriFactory;
+import com.github.tcurrie.rest.factory.RestUriFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;

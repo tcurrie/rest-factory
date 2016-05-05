@@ -1,4 +1,4 @@
-package simple.rest.factory;
+package com.github.tcurrie.rest.factory;
 
 import java.util.Arrays;
 import java.util.logging.Level;

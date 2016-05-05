@@ -1,8 +1,8 @@
-package simple.rest.factory.service;
+package com.github.tcurrie.rest.factory.service;
 
+import com.github.tcurrie.rest.factory.RestFactoryException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import simple.rest.factory.RestFactoryException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

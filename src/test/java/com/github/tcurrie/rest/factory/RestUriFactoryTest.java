@@ -1,4 +1,4 @@
-package simple.rest.factory;
+package com.github.tcurrie.rest.factory;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;

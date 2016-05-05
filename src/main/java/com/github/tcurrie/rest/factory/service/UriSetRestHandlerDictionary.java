@@ -1,6 +1,6 @@
-package simple.rest.factory.service;
+package com.github.tcurrie.rest.factory.service;
 
-import simple.rest.factory.RestFactoryException;
+import com.github.tcurrie.rest.factory.RestFactoryException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

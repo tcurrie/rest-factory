@@ -1,9 +1,9 @@
-package simple.rest.factory.service;
+package com.github.tcurrie.rest.factory.service;
 
+import com.github.tcurrie.rest.factory.RestParameterAdaptor;
 import com.openpojo.business.BusinessIdentity;
 import com.openpojo.business.annotation.BusinessKey;
-import simple.rest.factory.RestParameterAdaptor;
-import simple.rest.factory.RestResponseAdaptor;
+import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -10,7 +10,7 @@
         <version>9</version>
     </parent>
 
-    <groupId>simple</groupId>
+    <groupId>com.github.tcurrie</groupId>
     <artifactId>rest.factory</artifactId>
     <version>0.1-SNAPSHOT</version>
 
