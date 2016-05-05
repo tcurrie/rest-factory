@@ -26,7 +26,7 @@ public class RestUriFactory {
     }
 
     String getCanonicalPart(final Class<?> c, final int part) {
-        final String[] parts = c.getCanonicalName().split(".");
+        final String[] parts = c.getCanonicalName().split("\\.");
         return part < parts.length && parts.length + part > -1 ?
                 part < 0 ? parts[parts.length + part]
                         : parts[part]
