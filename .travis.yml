@@ -3,6 +3,7 @@ branches:
   - travis
 language: java
 jdk: oraclejdk8
+before_install: mvn versions:set -DnewVersion=0.1.$TRAVIS_BUILD_NUMBER
 script: mvn test jacoco:report coveralls:report
 env:
   global:
