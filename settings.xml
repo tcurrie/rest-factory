@@ -15,6 +15,6 @@
         <gpg.keyname>sonatype-nexus-snapshots</gpg.keyname>
       </properties>
     </profile>
-  <profiles>
+  </profiles>
 </settings>
 
