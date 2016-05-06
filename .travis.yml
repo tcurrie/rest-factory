@@ -10,6 +10,7 @@ script:
 - mvn test jacoco:report coveralls:report -B
 before_deploy:
 - git clone -b travis `git config --get remote.origin.url` target/travis
+deploy:
 - mvn deploy -DskipTests=true -Prelease --settings target/travis/settings.xml"
 env:
   global:
