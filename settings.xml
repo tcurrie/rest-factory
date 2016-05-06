@@ -4,7 +4,6 @@
       <id>sonatype-nexus-snapshots</id>
       <username>${env.CI_DEPLOY_USERNAME}</username>
       <password>${env.CI_DEPLOY_PASSWORD}</password>
-      <passphrase>${env.CI_DEPLOY_PASSPHRASE}</passphrase>
     </server>
   </servers>
   <profiles>
