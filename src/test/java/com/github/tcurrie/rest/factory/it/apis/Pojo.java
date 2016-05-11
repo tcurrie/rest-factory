@@ -33,7 +33,7 @@ public class Pojo implements Serializable {
 
     @Override
     public String toString() {
-        return "Pojo{" +
+        return "PojoMe{" +
                 "value='" + value + '\'' +
                 ", data=" + Arrays.toString(data) +
                 '}';

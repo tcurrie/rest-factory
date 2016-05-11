@@ -20,7 +20,7 @@ public interface RestResponseAdaptor<U> extends Function<U, Consumer<HttpServlet
                 response.setHeader("Content-Type", "application/json");
                 try {
                     LOGGER.log(Level.FINE, "Adapting result [{0}] to response.", new Object[]{result});
-                    MAPPER.writeValue(response.getWriter(), result);
+                    MAPPER.writeValue(response.getWriter(), ResponseWrapper.create(result));
                 } catch (final IOException e) {
                     throw RestFactoryException.create(LOGGER, Level.WARNING, "Failed to adapt result [{0}] to response.", e, result);
                 }

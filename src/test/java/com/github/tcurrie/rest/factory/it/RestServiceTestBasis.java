@@ -4,7 +4,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.WebDriver;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class RestServiceTestBasis {
+    private static final Logger LOGGER = Logger.getLogger(RestServiceTestBasis.class.getName());
     private EmbeddedProxy proxy;
     private WebDriver webdriver;
 
@@ -16,8 +20,16 @@ public class RestServiceTestBasis {
 
     @After
     public void after() {
-        webdriver.quit();
-        proxy.stop();
+        try {
+            webdriver.quit();
+        } catch (final Exception e) {
+            LOGGER.log(Level.FINEST, "Webdriver failed to quit. {0}", e);
+        }
+        try {
+            proxy.stop();
+        } catch (final Exception e) {
+            LOGGER.log(Level.FINEST, "Proxy failed to stop. {0}", e);
+        }
     }
 
 

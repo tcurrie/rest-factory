@@ -1,9 +1,16 @@
 package com.github.tcurrie.rest.factory.client;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tcurrie.rest.factory.ResponseWrapper;
 import com.github.tcurrie.rest.factory.RestParameterAdaptor;
 import com.github.tcurrie.rest.factory.proxy.ProxyMethod;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -46,6 +53,22 @@ class RestClientMethod<T> implements ProxyMethod<T> {
         final String body = parameterAdaptor.apply(args);
         LOGGER.log(Level.INFO, "For method [{0}] and args [{1}], posting to [{2}] with [{3}]", new Object[]{method, args, url, body});
         //TODO Remove dependency on Spring's rest template and/or at least handle timeouts!
-        return new RestTemplate().postForObject(url, body, methodResult);
+        final RestTemplate template = new RestTemplate();
+        final HttpEntity<String> entity = new HttpEntity<String>(body);
+        final ResponseEntity<String> response = ((RestTemplate) template).exchange(url, HttpMethod.POST, entity, String.class);
+        System.out.println(response.getBody());
+
+
+        final JavaType type = new ObjectMapper().getTypeFactory().constructParametrizedType(ResponseWrapper.class, ResponseWrapper.class,
+                void.class.equals(methodResult) ? Object.class : methodResult);
+        System.out.println(type);
+        try {
+            final ResponseWrapper<T> wrapper = new ObjectMapper().readValue(response.getBody(), type);
+            return wrapper.getResult();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+
     }
 }
