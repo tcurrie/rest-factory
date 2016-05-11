@@ -57,7 +57,7 @@ public final class GeneratedRestService extends HttpServlet {
             final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
             final Map<String, Object> beans = applicationContext.getBeansWithAnnotation(RestService.class);
             LOGGER.log(Level.INFO, "Got Rest Service Beans[{0}]", beans);
-            this.configuration = UriSetRestHandlerDictionary.create(RestMethodFactory.create(beans));
+            this.configuration = UriSetRestHandlerDictionary.create(RestMethodFactory.create(beans.values()));
             LOGGER.log(Level.INFO, "Mapped rest services [{0}]", configuration);
         } catch (final Exception e) {
             throw RestFactoryException.create(LOGGER, "Failed to map Generated Rest Services.", e);

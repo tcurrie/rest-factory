@@ -7,17 +7,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 final class UriSetRestHandlerDictionary implements RestMethodDictionary {
     // TODO Replace with node search for speed
     private static final Logger LOGGER = Logger.getLogger(UriSetRestHandlerDictionary.class.getName());
     private final Set<RestMethod> handlers;
 
-    static UriSetRestHandlerDictionary create(final Set<RestMethod> handlers) {
-        final UriSetRestHandlerDictionary dictionary = new UriSetRestHandlerDictionary(handlers);
-        dictionary.handlers.addAll(RestMethodFactory.create(dictionary));
-
-        return dictionary;
+    static UriSetRestHandlerDictionary create(final Stream<RestMethod> handlers) {
+        return new UriSetRestHandlerDictionary(handlers.collect(Collectors.toSet()));
     }
 
     private UriSetRestHandlerDictionary(final Set<RestMethod> beans) {

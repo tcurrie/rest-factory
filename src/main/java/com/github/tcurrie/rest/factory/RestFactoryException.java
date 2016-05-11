@@ -5,8 +5,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class RestFactoryException extends RuntimeException {
-
-
     public static RestFactoryException create(final Logger logger, final String message, final Object... parameters) {
         logger.log(Level.SEVERE, message, parameters);
         return new RestFactoryException(format(message, parameters));

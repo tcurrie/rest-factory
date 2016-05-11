@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -44,6 +45,49 @@ public class RestUriFactoryTest {
                 assertThat(actual, is(expected));
             })
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testCreateUriPrependedWithSuppliedUrlAfterGet() throws NoSuchMethodException {
+        final String urlInitial = RandomFactory.getRandomValue(String.class);
+        final String urlFixed = RandomFactory.getRandomValue(String.class);
+        final String uri = RandomFactory.getRandomValue(String.class);
+
+        final Supplier<String> urlSupplier = ()->urlInitial;
+        final Class type = RestUriFactoryTest.class;
+        final Method method = type.getMethod("before");
+
+        Mockito.doCallRealMethod().when(mockFactory).create(urlSupplier, type, method);
+        Mockito.when(mockFactory.create(type, method)).thenReturn(uri);
+        Mockito.when(mockFactory.removeSlash(urlInitial)).thenReturn(urlFixed);
+
+        final String expected = urlFixed + uri;
+
+        final Supplier<String> result = mockFactory.create(urlSupplier, type, method);
+
+        Mockito.verify(mockFactory).create(urlSupplier, type, method);
+        Mockito.verify(mockFactory).create(type, method);
+        Mockito.verify(mockFactory, Mockito.never()).removeSlash(urlInitial);
+
+        final String actual = result.get();
+
+        Mockito.verify(mockFactory).removeSlash(urlInitial);
+        Mockito.verifyNoMoreInteractions(mockFactory);
+
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testRemoveSlash() {
+        ImmutableMap.<String,String>builder()
+                .put("", "")
+                .put("/", "")
+                .put("asdf/", "asdf")
+                .put("qwer//", "qwer")
+                .put("/zxvc", "/zxvc")
+                .put("/tyui/ ", "/tyui/ ")
+                .build().entrySet().forEach(e -> assertThat(RestUriFactory.getInstance().removeSlash(e.getKey()), is(e.getValue())));
     }
 
     @SuppressWarnings("unchecked")

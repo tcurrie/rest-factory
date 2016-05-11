@@ -1,6 +1,7 @@
 package com.github.tcurrie.rest.factory;
 
 import java.lang.reflect.Method;
+import java.util.function.Supplier;
 
 public class RestUriFactory {
     private static final RestUriFactory INSTANCE = new RestUriFactory();
@@ -10,6 +11,15 @@ public class RestUriFactory {
     }
 
     private RestUriFactory() {
+    }
+
+    public <T> Supplier<String> create(final Supplier<String> urlSupplier, final Class<T> service, final Method method) {
+        final String methodUri = create(service, method);
+        return () -> removeSlash(urlSupplier.get()) + methodUri;
+    }
+
+    String removeSlash(final String url) {
+        return url.replaceAll("/*$", "");
     }
 
     public String create(final Class<?> c, final Method m) {
