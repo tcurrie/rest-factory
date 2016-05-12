@@ -20,6 +20,6 @@ public final class RestClientFactory {
         final RestParameterAdaptor.Client methodArgs = RestParameterAdaptor.Client.Factory.create(method);
         @SuppressWarnings("unchecked")
         final Class<U> methodResult = (Class<U>) method.getReturnType();
-        return new RestClientMethod<U>(method, methodUrlSupplier, methodArgs, methodResult);
+        return new RestClientMethod<>(method, methodUrlSupplier, methodArgs, methodResult);
     }
 }

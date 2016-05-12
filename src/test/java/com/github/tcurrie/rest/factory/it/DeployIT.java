@@ -7,7 +7,7 @@ import org.openqa.selenium.WebElement;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class DeployIT extends RestServiceTestBasis {
+public class DeployIT extends WebDriverTestBasis {
 
     @Test
     public void shouldDeployServer() {

@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 final class RestMethod<T, U> {
     private static final Logger LOGGER = Logger.getLogger(RestMethod.class.getName());
-    private static final RestResponseAdaptor<Object[]> ECHO_ADAPTOR = RestResponseAdaptor.Factory.<Object[]>create();
+    private static final RestResponseAdaptor<Object[]> ECHO_ADAPTOR = RestResponseAdaptor.Factory.create();
     @BusinessKey
     private final String uri;
     private final Method method;

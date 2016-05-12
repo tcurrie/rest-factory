@@ -1,34 +1,39 @@
-package com.github.tcurrie.rest.factory.it.apis;
+package com.github.tcurrie.rest.factory.it.impls;
 
-import com.github.tcurrie.rest.factory.it.RestServiceTestBasis;
+import com.github.tcurrie.rest.factory.it.WebDriverTestBasis;
+import com.github.tcurrie.rest.factory.it.apis.Pojo;
+import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.github.tcurrie.rest.factory.service.RestService;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 @RestService
 public class TestService implements TestApi {
-    private static final Logger LOGGER = Logger.getLogger(RestServiceTestBasis.class.getName());
+    public static final Map<String, Object> DATA = new HashMap<>();
+    private static final Logger LOGGER = Logger.getLogger(WebDriverTestBasis.class.getName());
 
     @Override
     public void runnable() {
         LOGGER.log(Level.INFO, "RAN " + System.currentTimeMillis());
-        TestApi.DATA.compute("runs", (k,v)->v==null?1:((Integer)v)+1);
+        DATA.compute("runs", (k,v)->v==null?1:((Integer)v)+1);
     }
 
     @Override
     public void consumer(final Pojo c) {
         LOGGER.log(Level.INFO, "CONSUMED [" + c + "] " + System.currentTimeMillis());
-        TestApi.DATA.put("consumed", c);
+        DATA.put("consumed", c);
     }
 
     @Override
     public Pojo producer() {
-        final Pojo product = (Pojo) TestApi.DATA.get("produce");
+        final Pojo product = (Pojo) DATA.get("produce");
         LOGGER.log(Level.INFO, "PRODUCED [" + product + "] " + System.currentTimeMillis());
         return product;
     }

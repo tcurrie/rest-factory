@@ -24,6 +24,6 @@ final class RestMethodFactory {
         final String uri = RestUriFactory.getInstance().create(type, method);
         final RestParameterAdaptor.Service requestAdaptor = RestParameterAdaptor.Service.Factory.create(method);
         final RestResponseAdaptor<U> resultAdaptor = RestResponseAdaptor.Factory.create();
-        return new RestMethod<T, U>(uri, method, (T) bean, requestAdaptor, resultAdaptor);
+        return new RestMethod<>(uri, method, (T) bean, requestAdaptor, resultAdaptor);
     }
 }

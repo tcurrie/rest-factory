@@ -11,9 +11,6 @@ public enum RestServers {
     public String getUrl() {
         return RewriteServer.BASE_URL + contextPath;
     }
-    public String getContextPath() {
-        return contextPath;
-    }
     private static final class RewriteServer {
         private static final int PORT = Integer.parseInt(System.getProperty("test.port", "9090"));
         private static final String BASE_URL = System.getProperty("test.host", "http://localhost:" + PORT);

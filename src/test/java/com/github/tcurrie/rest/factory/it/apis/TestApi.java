@@ -1,10 +1,6 @@
 package com.github.tcurrie.rest.factory.it.apis;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public interface TestApi {
-    Map<String, Object> DATA = new HashMap<>();
 
     void runnable();
     void consumer(Pojo m);

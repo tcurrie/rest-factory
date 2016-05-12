@@ -120,12 +120,6 @@
             <version>2.52.0</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>net.lightbody.bmp</groupId>
-            <artifactId>browsermob-core-littleproxy</artifactId>
-            <version>2.1.0-beta-3</version>
-            <scope>test</scope>
-        </dependency>
 
         <!-- RELEASE DEPENDENCIES -->
         <dependency>

@@ -20,7 +20,7 @@ public interface RestParameterAdaptor {
                     try {
                         return MAPPER.writeValueAsString(p);
                     } catch (final JsonProcessingException e) {
-                        throw RestFactoryException.create(LOGGER, "Failed to map [{0}].", e, p);
+                        throw RestFactoryException.create(LOGGER, "Failed to map [{0}] for method [{1}].", e, p, method);
                     }
                 };
             }

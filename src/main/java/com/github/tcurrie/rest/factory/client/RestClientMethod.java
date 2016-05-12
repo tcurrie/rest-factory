@@ -54,8 +54,8 @@ class RestClientMethod<T> implements ProxyMethod<T> {
         LOGGER.log(Level.INFO, "For method [{0}] and args [{1}], posting to [{2}] with [{3}]", new Object[]{method, args, url, body});
         //TODO Remove dependency on Spring's rest template and/or at least handle timeouts!
         final RestTemplate template = new RestTemplate();
-        final HttpEntity<String> entity = new HttpEntity<String>(body);
-        final ResponseEntity<String> response = ((RestTemplate) template).exchange(url, HttpMethod.POST, entity, String.class);
+        final HttpEntity<String> entity = new HttpEntity<>(body);
+        final ResponseEntity<String> response = template.exchange(url, HttpMethod.POST, entity, String.class);
         System.out.println(response.getBody());
 
 

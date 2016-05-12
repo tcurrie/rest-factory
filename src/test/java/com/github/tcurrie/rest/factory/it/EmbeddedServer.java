@@ -22,15 +22,12 @@ public class EmbeddedServer {
         return new EmbeddedServer(port);
     }
 
-    public EmbeddedServer deploy(final String war, final String contextPath) {
+    public void deploy(final String war, final String contextPath) {
         try {
             tomcat.addWebapp(contextPath, (new File(war)).getAbsolutePath());
-
         } catch (final ServletException e) {
             throw new RuntimeException(e);
         }
-
-        return this;
     }
 
     public EmbeddedServer start() {

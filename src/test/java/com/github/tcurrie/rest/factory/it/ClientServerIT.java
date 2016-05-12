@@ -3,6 +3,7 @@ package com.github.tcurrie.rest.factory.it;
 import com.github.tcurrie.rest.factory.client.RestClientFactory;
 import com.github.tcurrie.rest.factory.it.apis.Pojo;
 import com.github.tcurrie.rest.factory.it.apis.TestApi;
+import com.github.tcurrie.rest.factory.it.impls.TestService;
 import com.google.common.collect.Lists;
 import com.openpojo.random.RandomFactory;
 import com.openpojo.random.RandomGenerator;
@@ -16,10 +17,9 @@ import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 
-public class ClientServerIT extends RestServiceTestBasis {
+public class ClientServerIT extends WebDriverTestBasis {
 
     private TestApi client;
 
@@ -37,32 +37,30 @@ public class ClientServerIT extends RestServiceTestBasis {
             }
         });
         client = RestClientFactory.create(TestApi.class, ()->RestServers.SERVER.getUrl() + "/spring-generated-rest");
-
     }
 
     @Test
     public void testRuns() {
-        Assert.assertThat(TestApi.DATA.get("runs"), nullValue());
+        Assert.assertThat(TestService.DATA.get("runs"), nullValue());
         client.runnable();
-        Assert.assertThat(TestApi.DATA.get("runs"), is(1));
+        Assert.assertThat(TestService.DATA.get("runs"), is(1));
     }
 
     @Test
     public void testConsumesPojo() {
         final Pojo expected = RandomFactory.getRandomValue(Pojo.class);
 
-        Assert.assertThat(TestApi.DATA.get("consumed"), nullValue());
+        Assert.assertThat(TestService.DATA.get("consumed"), nullValue());
         client.consumer(expected);
-        validate(expected, (Pojo) TestApi.DATA.get("consumed"));
-
+        assertThat(TestService.DATA.get("consumed"), is(expected));
     }
 
     @Test
     public void testProducesPojo() {
         final Pojo expected = RandomFactory.getRandomValue(Pojo.class);
-        TestApi.DATA.put("produce", expected);
+        TestService.DATA.put("produce", expected);
         final Pojo actual = client.producer();
-        validate(expected, actual);
+        assertThat(actual, is(expected));
     }
 
     @Test
@@ -74,7 +72,7 @@ public class ClientServerIT extends RestServiceTestBasis {
 
         final Pojo actual = client.reverse(input);
 
-        validate(expected, actual);
+        assertThat(actual, is(expected));
     }
 
     @Test
@@ -86,7 +84,7 @@ public class ClientServerIT extends RestServiceTestBasis {
 
         final Pojo actual = client.concatenate(a, b);
 
-        validate(expected, actual);
+        assertThat(actual, is(expected));
     }
 
     @Test
@@ -112,10 +110,5 @@ public class ClientServerIT extends RestServiceTestBasis {
         final int actual = client.sum(a, b, c);
 
         assertThat(actual, is(expected));
-    }
-
-    private void validate(final Pojo expected, final Pojo actual) {
-        assertThat(actual.getValue(), is(expected.getValue()));
-        assertArrayEquals(expected.getData(), actual.getData());
     }
 }

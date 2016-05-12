@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public interface JsonAdaptor extends Function<Reader, Object[]> {
@@ -15,7 +16,9 @@ public interface JsonAdaptor extends Function<Reader, Object[]> {
         private static final ObjectMapper MAPPER = new ObjectMapper();
 
         public static JsonAdaptor create(final Class<?>[] parameterTypes) {
+            LOGGER.log(Level.INFO, "Creating Json adaptor from Reader to [{0}]", Arrays.toString(parameterTypes));
             validateParameters(parameterTypes);
+
             return r -> {
                 final Object[] args = new Object[parameterTypes.length];
                 try {
@@ -24,6 +27,7 @@ public interface JsonAdaptor extends Function<Reader, Object[]> {
                     for (int i = 0; i < parameterTypes.length; i++) {
                         p.nextToken();
                         args[i] = MAPPER.readValue(p, parameterTypes[i]);
+                        LOGGER.log(Level.FINEST, "Parsed arg [{0}], type [{1}] as [{2}].", new Object[] {i, parameterTypes[i], args[i]});
                     }
                     return args;
                 } catch (final Exception e) {

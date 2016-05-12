@@ -12,3 +12,5 @@ On the client side:
         final MyApi client = RestClientFactory.create(MyApi.class, ()->url);
 
 **_Time for a coffee break!_**
+
+_[tfm...](https://github.com/tcurrie/rest-factory/wiki)_

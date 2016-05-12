@@ -18,26 +18,26 @@ public final class GeneratedRestService extends HttpServlet {
     private UriSetRestHandlerDictionary configuration;
 
     @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
         configuration.getHandler(req).invoke(req, resp);
     }
 
     @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
         configuration.getHandler(req).invoke(req, resp);
     }
 
     @Override
-    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp) {
         configuration.getHandler(req).invoke(req, resp);
     }
 
     @Override
-    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) {
         configuration.getHandler(req).invoke(req, resp);
     }
 
-    protected void doEcho(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    protected void doEcho(final HttpServletRequest req, final HttpServletResponse resp) {
         configuration.getHandler(req).echo(req, resp);
     }
 
