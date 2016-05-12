@@ -67,4 +67,14 @@ public class TestService implements TestApi {
         LOGGER.log(Level.INFO, "Sum [" + Arrays.toString(values) + "] to [" + sum + "] " + System.currentTimeMillis());
         return sum;
     }
+
+    @Override
+    public int throwsException() throws Exception {
+        throw (Exception) DATA.get("exception");
+    }
+
+    @Override
+    public int throwsRuntimeException() {
+        throw (RuntimeException) DATA.get("runtimeException");
+    }
 }

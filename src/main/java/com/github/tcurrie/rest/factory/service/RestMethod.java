@@ -1,9 +1,10 @@
 package com.github.tcurrie.rest.factory.service;
 
+import com.github.tcurrie.rest.factory.RestExceptionAdaptor;
 import com.github.tcurrie.rest.factory.RestParameterAdaptor;
+import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import com.openpojo.business.BusinessIdentity;
 import com.openpojo.business.annotation.BusinessKey;
-import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,15 +16,15 @@ import java.util.logging.Logger;
 
 final class RestMethod<T, U> {
     private static final Logger LOGGER = Logger.getLogger(RestMethod.class.getName());
-    private static final RestResponseAdaptor<Object[]> ECHO_ADAPTOR = RestResponseAdaptor.Factory.create();
+    private static final RestResponseAdaptor.Service<Object[]> ECHO_ADAPTOR = RestResponseAdaptor.Service.Factory.create();
     @BusinessKey
     private final String uri;
     private final Method method;
     private final T bean;
     private final RestParameterAdaptor.Service requestAdaptor;
-    private final RestResponseAdaptor<U> responseAdaptor;
+    private final RestResponseAdaptor.Service<U> responseAdaptor;
 
-    RestMethod(final String uri, final Method method, final T bean, final RestParameterAdaptor.Service requestAdaptor, final RestResponseAdaptor<U> responseAdaptor) {
+    RestMethod(final String uri, final Method method, final T bean, final RestParameterAdaptor.Service requestAdaptor, final RestResponseAdaptor.Service<U> responseAdaptor) {
         this.uri = uri;
         this.method = method;
         this.bean = bean;
@@ -52,10 +53,12 @@ final class RestMethod<T, U> {
             final U result = (U) method.invoke(bean, args);
             LOGGER.log(Level.INFO, "Got Result [{0}]", result);
             responseAdaptor.apply(result).accept(resp);
-        } catch (InvocationTargetException e) {
-            LOGGER.log(Level.SEVERE, "Failed to invoke [{0}]: {1}", new Object[]{e, e.getCause()});
+        } catch (final InvocationTargetException e) {
+            LOGGER.log(Level.SEVERE, "Failed to invoke: {0}", e.getCause());
+            RestExceptionAdaptor.Service.Factory.apply(e.getCause()).accept(resp);
         } catch (final Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to invoke [{0}]", e);
+            LOGGER.log(Level.SEVERE, "Failed to invoke: {0}", e);
+            RestExceptionAdaptor.Service.Factory.apply(e).accept(resp);
         }
     }
 

@@ -9,4 +9,6 @@ public interface TestApi {
     Pojo concatenate(Pojo a, Pojo b);
     int add(int a, int b);
     int sum(int... values);
+    int throwsException() throws Exception;
+    int throwsRuntimeException();
 }

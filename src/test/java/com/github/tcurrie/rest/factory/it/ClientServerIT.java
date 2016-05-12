@@ -9,15 +9,21 @@ import com.openpojo.random.RandomFactory;
 import com.openpojo.random.RandomGenerator;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Assert;
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class ClientServerIT extends WebDriverTestBasis {
 
@@ -41,16 +47,16 @@ public class ClientServerIT extends WebDriverTestBasis {
 
     @Test
     public void testRuns() {
-        Assert.assertThat(TestService.DATA.get("runs"), nullValue());
+        assertThat(TestService.DATA.get("runs"), nullValue());
         client.runnable();
-        Assert.assertThat(TestService.DATA.get("runs"), is(1));
+        assertThat(TestService.DATA.get("runs"), is(1));
     }
 
     @Test
     public void testConsumesPojo() {
         final Pojo expected = RandomFactory.getRandomValue(Pojo.class);
 
-        Assert.assertThat(TestService.DATA.get("consumed"), nullValue());
+        assertThat(TestService.DATA.get("consumed"), nullValue());
         client.consumer(expected);
         assertThat(TestService.DATA.get("consumed"), is(expected));
     }
@@ -110,5 +116,37 @@ public class ClientServerIT extends WebDriverTestBasis {
         final int actual = client.sum(a, b, c);
 
         assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testThrowsException() {
+        final Exception expected = new Exception(RandomFactory.getRandomValue(String.class));
+        final StringWriter stack = new StringWriter();
+        expected.printStackTrace(new PrintWriter(stack));
+        TestService.DATA.put("exception", expected);
+
+        try {
+            final int result = client.throwsException();
+            fail("Should have thrown exception, got[" + result  +"]");
+        } catch (final Exception actual) {
+            assertThat(actual, CoreMatchers.instanceOf(expected.getClass()));
+            assertThat(actual.getMessage(), allOf(startsWith(expected.getMessage()), containsString(stack.toString())));
+        }
+    }
+    @Test
+    public void testThrowsRuntimeException() {
+        final Exception expected = new RuntimeException(RandomFactory.getRandomValue(String.class),
+                new RuntimeException(RandomFactory.getRandomValue(String.class)));
+        final StringWriter stack = new StringWriter();
+        expected.printStackTrace(new PrintWriter(stack));
+        TestService.DATA.put("runtimeException", expected);
+
+        try {
+            final int result = client.throwsRuntimeException();
+            fail("Should have thrown exception, got[" + result  +"]");
+        } catch (final RuntimeException actual) {
+            assertThat(actual, CoreMatchers.instanceOf(expected.getClass()));
+            assertThat(actual.getMessage(), allOf(startsWith(expected.getMessage()), containsString(stack.toString())));
+        }
     }
 }

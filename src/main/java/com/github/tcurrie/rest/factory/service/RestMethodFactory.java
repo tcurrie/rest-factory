@@ -23,7 +23,7 @@ final class RestMethodFactory {
     private static <T, U> RestMethod<T, U> create(final Object bean, final Class<T> type, final Method method) {
         final String uri = RestUriFactory.getInstance().create(type, method);
         final RestParameterAdaptor.Service requestAdaptor = RestParameterAdaptor.Service.Factory.create(method);
-        final RestResponseAdaptor<U> resultAdaptor = RestResponseAdaptor.Factory.create();
+        final RestResponseAdaptor.Service<U> resultAdaptor = RestResponseAdaptor.Service.Factory.create();
         return new RestMethod<>(uri, method, (T) bean, requestAdaptor, resultAdaptor);
     }
 }

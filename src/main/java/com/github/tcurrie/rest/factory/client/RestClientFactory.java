@@ -1,6 +1,7 @@
 package com.github.tcurrie.rest.factory.client;
 
 import com.github.tcurrie.rest.factory.RestParameterAdaptor;
+import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import com.github.tcurrie.rest.factory.RestUriFactory;
 import com.github.tcurrie.rest.factory.proxy.ProxyFactory;
 
@@ -18,8 +19,7 @@ public final class RestClientFactory {
     static <T, U> RestClientMethod<U> create(final Class<T> service, final Supplier<String> urlSupplier, final Method method) {
         final Supplier<String> methodUrlSupplier = RestUriFactory.getInstance().create(urlSupplier, service, method);
         final RestParameterAdaptor.Client methodArgs = RestParameterAdaptor.Client.Factory.create(method);
-        @SuppressWarnings("unchecked")
-        final Class<U> methodResult = (Class<U>) method.getReturnType();
-        return new RestClientMethod<>(method, methodUrlSupplier, methodArgs, methodResult);
+        final RestResponseAdaptor.Client<U> responseAdaptor = RestResponseAdaptor.Client.Factory.create(method);
+        return new RestClientMethod<>(method, methodUrlSupplier, methodArgs, responseAdaptor);
     }
 }
