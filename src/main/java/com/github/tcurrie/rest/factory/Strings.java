@@ -13,15 +13,23 @@ public final class Strings {
     }
 
     public static String format(final String message, final Object... parameters) {
-        if (parameters.length == 0) {
+        if (message == null) {
+            return Arrays.toString(parameters);
+        } else if (parameters == null || parameters.length == 0) {
             return message;
+        } else if (getMarkerCount(message) < parameters.length) {
+            return format("Message[{}], parameters[{}]. Format failed.", message, parameters);
         } else {
-            try {
-                return MessageFormatter.arrayFormat(message, parameters).getMessage();
-            } catch (final Exception e) {
-                return message + " " + Arrays.toString(parameters) + "[FORMAT FAILED: " + e.getMessage() + "]";
-            }
+            return MessageFormatter.arrayFormat(message, parameters).getMessage();
         }
+    }
+
+    private static int getMarkerCount(final String message) {
+        int count = 0;
+        for (int index = message.indexOf("{}"); index > -1; index = message.indexOf("{}", index + 2)) {
+            count++;
+        }
+        return count;
     }
 
     public static String getStackTrace(final Throwable exception) {
