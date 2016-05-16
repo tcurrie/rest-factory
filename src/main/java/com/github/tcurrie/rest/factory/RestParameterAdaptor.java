@@ -48,7 +48,7 @@ public interface RestParameterAdaptor {
                 if (method.getParameterCount() == 0) {
                     return NO_ARGUMENT_ADAPTOR;
                 } else {
-                    final Function<Reader, Object[]> parser = JsonAdaptor.Factory.create(method.getParameterTypes());
+                    final Function<Reader, Object[]> parser = JsonAdaptor.Factory.create(method);
                     return r -> {
                         try {
                             return parser.apply(r.getReader());

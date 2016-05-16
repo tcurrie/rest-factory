@@ -3,14 +3,19 @@ package com.github.tcurrie.rest.factory.it.impls;
 import com.github.tcurrie.rest.factory.it.apis.Pojo;
 import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.github.tcurrie.rest.factory.service.RestService;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @RestService
@@ -51,6 +56,18 @@ public class TestService implements TestApi {
         final Pojo product = new Pojo(a.getValue() + " " + b.getValue(), ArrayUtils.addAll(a.getData(), b.getData()));
         LOGGER.info("Concatenate [" + a + "] and [" + b + "] to [" + product + "] " + System.currentTimeMillis());
         return product;
+    }
+
+    @Override
+    public Set<Pojo> dedup(final Pojo... values) {
+        return Sets.newHashSet(values);
+    }
+
+    @Override
+    public Pojo min(final Set<Pojo> values) {
+        final List<Pojo> sorted = Lists.newArrayList(values);
+        Collections.sort(sorted, (a, b) -> a.getValue().compareTo(b.getValue()));
+        return sorted.get(0);
     }
 
     @Override

@@ -2,17 +2,27 @@ package com.github.tcurrie.rest.factory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tcurrie.rest.factory.model.RestFactoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Reader;
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public interface JsonAdaptor extends Function<Reader, Object[]> {
     class Factory {
+
+        private static final Predicate<Class<?>> IS_NOT_INTERFACE = p -> !p.isInterface();
+        private static final Predicate<Class<?>> IS_NOT_ARRAY = (t1) -> !t1.isArray();
+        private static final Predicate<Class<?>> IS_NOT_PRIMITIVE = (t) -> !t.isPrimitive();
+
         private Factory() {
             throw RestFactoryException.create("Can not construct instance of Factory class.");
         }
@@ -20,10 +30,13 @@ public interface JsonAdaptor extends Function<Reader, Object[]> {
         private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
         private static final ObjectMapper MAPPER = new ObjectMapper();
 
-        public static JsonAdaptor create(final Class<?>[] parameterTypes) {
+        public static JsonAdaptor create(final Method method) {
+            final Class<?>[] parameterTypes = method.getParameterTypes();
             LOGGER.info("Creating Json adaptor from Reader to [{}]", Arrays.toString(parameterTypes));
             validateParameters(parameterTypes);
-
+            final List<JavaType> javaTypes =
+                    Arrays.stream(method.getGenericParameterTypes()).map(t->
+                    MAPPER.getTypeFactory().constructType(t)).collect(Collectors.toList());
             return r -> {
                 final Object[] args = new Object[parameterTypes.length];
                 try {
@@ -31,7 +44,7 @@ public interface JsonAdaptor extends Function<Reader, Object[]> {
                     p.nextToken();
                     for (int i = 0; i < parameterTypes.length; i++) {
                         p.nextToken();
-                        args[i] = MAPPER.readValue(p, parameterTypes[i]);
+                        args[i] = MAPPER.readValue(p, javaTypes.get(i));
                         LOGGER.debug("Parsed arg [{}], type [{}] as [{}].", i, parameterTypes[i], args[i]);
                     }
                     return args;
@@ -44,8 +57,9 @@ public interface JsonAdaptor extends Function<Reader, Object[]> {
 
         private static void validateParameters(final Class<?>[] parameterTypes) {
             Arrays.stream(parameterTypes)
-                    .filter(Factory::notPrimitive)
-                    .filter(Factory::notPrimitiveArray)
+                    .filter(IS_NOT_PRIMITIVE)
+                    .filter(IS_NOT_ARRAY)
+                    .filter(IS_NOT_INTERFACE)
                     .forEach(p -> {
                         try {
                             p.getDeclaredConstructor();
@@ -56,12 +70,5 @@ public interface JsonAdaptor extends Function<Reader, Object[]> {
                     });
         }
 
-        private static boolean notPrimitive(final Class<?> p) {
-            return !p.isPrimitive();
-        }
-
-        private static boolean notPrimitiveArray(final Class<?> p) {
-            return !p.isArray() || !p.getComponentType().isPrimitive();
-        }
     }
 }
