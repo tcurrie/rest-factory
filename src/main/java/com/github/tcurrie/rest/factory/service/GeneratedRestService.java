@@ -1,6 +1,8 @@
 package com.github.tcurrie.rest.factory.service;
 
-import com.github.tcurrie.rest.factory.RestFactoryException;
+import com.github.tcurrie.rest.factory.model.RestFactoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -10,11 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public final class GeneratedRestService extends HttpServlet {
-    private static final Logger LOGGER = Logger.getLogger(GeneratedRestService.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneratedRestService.class);
     private UriSetRestHandlerDictionary configuration;
 
     @Override
@@ -56,11 +56,12 @@ public final class GeneratedRestService extends HttpServlet {
             LOGGER.info("Beginning Servlet Config.");
             final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
             final Map<String, Object> beans = applicationContext.getBeansWithAnnotation(RestService.class);
-            LOGGER.log(Level.INFO, "Got Rest Service Beans[{0}]", beans);
+            LOGGER.info("Got Rest Service Beans[{}]", beans);
             this.configuration = UriSetRestHandlerDictionary.create(RestMethodFactory.create(beans.values()));
-            LOGGER.log(Level.INFO, "Mapped rest services [{0}]", configuration);
+            LOGGER.info("Mapped rest services [{}]", configuration);
         } catch (final Exception e) {
-            throw RestFactoryException.create(LOGGER, "Failed to map Generated Rest Services.", e);
+            LOGGER.error("Failed to map Generated Rest Services.", e);
+            throw RestFactoryException.create("Failed to map Generated Rest Services.", e);
         }
     }
 }

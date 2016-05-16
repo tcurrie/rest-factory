@@ -3,6 +3,8 @@ package com.github.tcurrie.rest.factory.client;
 import com.github.tcurrie.rest.factory.RestParameterAdaptor;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import com.github.tcurrie.rest.factory.proxy.ProxyMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -10,12 +12,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 //TODO Remove dependency on Spring's rest template and/or at least handle timeouts!
 class RestClientMethod<T> implements ProxyMethod<T> {
-    private static final Logger LOGGER = Logger.getLogger(RestClientMethod.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestClientMethod.class);
     private final Method method;
     private final Supplier<String> methodUrlSupplier;
     private final RestParameterAdaptor.Client parameterAdaptor;
@@ -46,7 +46,7 @@ class RestClientMethod<T> implements ProxyMethod<T> {
     public T invoke(final Object[] args) throws Throwable {
         final String url = methodUrlSupplier.get();
         final String body = parameterAdaptor.apply(args);
-        LOGGER.log(Level.INFO, "For method [{0}] and args [{1}], posting to [{2}] with [{3}]", new Object[]{method, args, url, body});
+        LOGGER.info("For method [{}] and args [{}], posting to [{}] with [{}]", method, args, url, body);
 
         final ResponseEntity<String> response = new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(body), String.class);
 

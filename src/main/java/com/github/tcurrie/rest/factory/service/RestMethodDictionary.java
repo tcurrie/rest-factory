@@ -1,18 +1,22 @@
 package com.github.tcurrie.rest.factory.service;
 
-import java.util.List;
+import com.openpojo.business.BusinessIdentity;
+import com.openpojo.business.annotation.BusinessKey;
+
+import java.util.Set;
 
 public interface RestMethodDictionary {
-    List<MethodDescription> getMethods();
+    Set<MethodDescription> getMethods();
 
     final class MethodDescription {
-        private final String uri;
-        private final String method;
-        private final String bean;
+        @BusinessKey private String uri;
+        private String method;
+        private String bean;
 
         public static MethodDescription create(final RestMethod h) {
             return new MethodDescription(h.getUri(), h.getMethod().getName(), h.getBean().getClass().getCanonicalName());
         }
+        private MethodDescription() {}
 
         private MethodDescription(final String uri, final String method, final String bean) {
             this.uri = uri;
@@ -33,12 +37,18 @@ public interface RestMethodDictionary {
         }
 
         @Override
+        public int hashCode() {
+            return BusinessIdentity.getHashCode(this);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            return BusinessIdentity.areEqual(this, obj);
+        }
+
+        @Override
         public String toString() {
-            return "MethodDescription{" +
-                    "uri='" + uri + '\'' +
-                    ", method='" + method + '\'' +
-                    ", bean='" + bean + '\'' +
-                    '}';
+            return BusinessIdentity.toString(this);
         }
     }
 }

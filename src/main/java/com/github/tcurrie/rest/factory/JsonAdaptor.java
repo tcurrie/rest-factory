@@ -3,20 +3,21 @@ package com.github.tcurrie.rest.factory;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tcurrie.rest.factory.model.RestFactoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public interface JsonAdaptor extends Function<Reader, Object[]> {
     class Factory {
-        private static final Logger LOGGER = Logger.getLogger(RestParameterAdaptor.class.getName());
+        private static final Logger LOGGER = LoggerFactory.getLogger(JsonAdaptor.class);
         private static final ObjectMapper MAPPER = new ObjectMapper();
 
         public static JsonAdaptor create(final Class<?>[] parameterTypes) {
-            LOGGER.log(Level.INFO, "Creating Json adaptor from Reader to [{0}]", Arrays.toString(parameterTypes));
+            LOGGER.info("Creating Json adaptor from Reader to [{}]", Arrays.toString(parameterTypes));
             validateParameters(parameterTypes);
 
             return r -> {
@@ -27,11 +28,12 @@ public interface JsonAdaptor extends Function<Reader, Object[]> {
                     for (int i = 0; i < parameterTypes.length; i++) {
                         p.nextToken();
                         args[i] = MAPPER.readValue(p, parameterTypes[i]);
-                        LOGGER.log(Level.FINEST, "Parsed arg [{0}], type [{1}] as [{2}].", new Object[] {i, parameterTypes[i], args[i]});
+                        LOGGER.debug("Parsed arg [{}], type [{}] as [{}].", i, parameterTypes[i], args[i]);
                     }
                     return args;
                 } catch (final Exception e) {
-                    throw RestFactoryException.create(LOGGER, "Failed to read arguments, got [{0}].", e, Arrays.toString(args));
+                    LOGGER.warn("Failed to read arguments, got [{}].", Arrays.toString(args), e);
+                    throw RestFactoryException.create(Strings.format("Failed to read arguments, got [{}].", Arrays.toString(args)), e);
                 }
             };
         }
@@ -44,7 +46,8 @@ public interface JsonAdaptor extends Function<Reader, Object[]> {
                         try {
                             p.getDeclaredConstructor();
                         } catch (final NoSuchMethodException e) {
-                            throw RestFactoryException.create(LOGGER, "Can not wire adaptor for parameter [{0}] type has no default constructor.", e, p);
+                            LOGGER.error("Can not wire adaptor for parameter [{}] type has no default constructor.", p, e);
+                            throw RestFactoryException.create(Strings.format("Can not wire adaptor for parameter [{}] type has no default constructor.", p), e);
                         }
                     });
         }

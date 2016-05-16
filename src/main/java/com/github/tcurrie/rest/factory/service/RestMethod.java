@@ -5,17 +5,17 @@ import com.github.tcurrie.rest.factory.RestParameterAdaptor;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import com.openpojo.business.BusinessIdentity;
 import com.openpojo.business.annotation.BusinessKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 final class RestMethod<T, U> {
-    private static final Logger LOGGER = Logger.getLogger(RestMethod.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestMethod.class);
     private static final RestResponseAdaptor.Service<Object[]> ECHO_ADAPTOR = RestResponseAdaptor.Service.Factory.create();
     @BusinessKey
     private final String uri;
@@ -46,25 +46,25 @@ final class RestMethod<T, U> {
 
     @SuppressWarnings("unchecked")
     public void invoke(final HttpServletRequest req, final HttpServletResponse resp) {
-        LOGGER.log(Level.INFO, "Invoking [{0}]", this);
+        LOGGER.info("Invoking [{}]", uri);
         try {
             final Object[] args = requestAdaptor.apply(req);
-            LOGGER.log(Level.INFO, "Parsed Args [{0}]", Arrays.asList(args));
+            LOGGER.info("Parsed Args [{}]", Arrays.asList(args));
             final U result = (U) method.invoke(bean, args);
-            LOGGER.log(Level.INFO, "Got Result [{0}]", result);
+            LOGGER.info("Got Result [{}]", result);
             responseAdaptor.apply(result).accept(resp);
         } catch (final InvocationTargetException e) {
-            LOGGER.log(Level.SEVERE, "Failed to invoke: {0}", e.getCause());
+            LOGGER.warn("Failed to invoke: {}", uri, e.getCause());
             RestExceptionAdaptor.Service.Factory.apply(e.getCause()).accept(resp);
         } catch (final Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to invoke: {0}", e);
+            LOGGER.warn("Failed to invoke: {}", uri, e);
             RestExceptionAdaptor.Service.Factory.apply(e).accept(resp);
         }
     }
 
     public void echo(final HttpServletRequest req, final HttpServletResponse resp) {
         final Object[] args = requestAdaptor.apply(req);
-        LOGGER.log(Level.INFO, "Parsed Args [{0}]", Arrays.asList(args));
+        LOGGER.info("Parsed Args [{}]", Arrays.asList(args));
         ECHO_ADAPTOR.apply(args).accept(resp);
     }
 

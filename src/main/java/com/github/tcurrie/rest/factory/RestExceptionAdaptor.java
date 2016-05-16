@@ -1,22 +1,29 @@
 package com.github.tcurrie.rest.factory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tcurrie.rest.factory.model.ExceptionWrapper;
+import com.github.tcurrie.rest.factory.model.ResponseWrapper;
+import com.github.tcurrie.rest.factory.model.RestFactoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.function.Consumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public interface RestExceptionAdaptor {
     interface Client {
         class Factory {
-            private static final Logger LOGGER = Logger.getLogger(Client.class.getName());
-            public static <T> Throwable create(final ResponseWrapper<T> wrapper) {
+            private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
+            public static Throwable create(final ExceptionWrapper wrapper) {
                 try {
-                    return (Throwable) wrapper.getExceptionType().getConstructor(String.class).newInstance(wrapper.getException());
+                    LOGGER.debug("Adapting exception result [{}] from response.", wrapper.getMessage());
+                    return (Throwable) wrapper.getExceptionType().getConstructor(String.class, Throwable.class).newInstance(wrapper.getMessage(),
+                            wrapper.getExceptionType().getConstructor(String.class).newInstance(wrapper.getStackTrace())
+                    );
                 } catch (final Exception e) {
-                    throw RestFactoryException.create(LOGGER, Level.WARNING, "Failed to adapt result [{0}] to response.", e, wrapper.getException());
+                    LOGGER.warn("Failed to adapt exception [{}] from response.", wrapper.getStackTrace(), e);
+                    throw RestFactoryException.create(Strings.format("Failed to adapt exception [{}] from response.", wrapper.getStackTrace()), e);
                 }
             }
         }
@@ -24,16 +31,17 @@ public interface RestExceptionAdaptor {
     interface Service {
         class Factory {
             private static final ObjectMapper MAPPER = new ObjectMapper();
-            private static final Logger LOGGER = Logger.getLogger(Service.class.getName());
-            public static <T> Consumer<HttpServletResponse> apply(final Throwable exception) {
+            private static final Logger LOGGER = LoggerFactory.getLogger(Service.class);
+            public static Consumer<HttpServletResponse> apply(final Throwable throwable) {
                 return response -> {
                     response.setStatus(HttpServletResponse.SC_OK);
                     response.setHeader("Content-Type", "application/json");
                     try {
-                        LOGGER.log(Level.FINE, "Adapting exception result [{0}] to response.", new Object[]{exception});
-                        MAPPER.writeValue(response.getWriter(), ResponseWrapper.createException(exception));
+                        LOGGER.debug("Adapting exception result [{}] to response.", new Object[]{throwable});
+                        MAPPER.writeValue(response.getWriter(), ResponseWrapper.createException(ExceptionWrapper.createException(throwable)));
                     } catch (final IOException e) {
-                        throw RestFactoryException.create(LOGGER, Level.WARNING, "Failed to adapt result [{0}] to response.", e, exception);
+                        LOGGER.warn("Failed to adapt exception [{}] to response.", throwable.getStackTrace(), e);
+                        throw RestFactoryException.create(Strings.format("Failed to adapt exception [{}] to response.", Strings.getStackTrace(throwable)), e);
                     }
                 };
             }

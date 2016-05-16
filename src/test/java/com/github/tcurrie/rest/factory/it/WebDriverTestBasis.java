@@ -4,12 +4,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class WebDriverTestBasis {
-    private static final Logger LOGGER = Logger.getLogger(WebDriverTestBasis.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebDriverTestBasis.class);
     private WebDriver webdriver;
 
     @Before
@@ -22,10 +22,9 @@ public class WebDriverTestBasis {
         try {
             webdriver.quit();
         } catch (final Exception e) {
-            LOGGER.log(Level.FINEST, "Webdriver failed to quit. {0}", e);
+            LOGGER.debug("Webdriver failed to quit.", e);
         }
     }
-
 
     protected WebDriver getWebdriver() {
         return webdriver;
