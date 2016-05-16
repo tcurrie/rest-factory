@@ -1,6 +1,7 @@
 package com.github.tcurrie.rest.factory.service;
 
 
+import com.github.tcurrie.rest.factory.model.RestFactoryException;
 import com.github.tcurrie.rest.factory.proxy.Methods;
 import com.github.tcurrie.rest.factory.RestParameterAdaptor;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;
@@ -11,6 +12,10 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 final class RestMethodFactory {
+    private RestMethodFactory() {
+        throw RestFactoryException.create("Can not construct instance of Factory class.");
+    }
+
     static Stream<RestMethod> create(final Collection<Object> beans) {
         return beans.stream().flatMap(RestMethodFactory::create);
     }

@@ -1,12 +1,17 @@
 package com.github.tcurrie.rest.factory;
 
+import com.github.tcurrie.rest.factory.model.RestFactoryException;
 import org.slf4j.helpers.MessageFormatter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 
-public class Strings {
+public final class Strings {
+    private Strings() {
+        throw RestFactoryException.create("Can not construct instance of Factory class.");
+    }
+
     public static String format(final String message, final Object... parameters) {
         if (parameters.length == 0) {
             return message;

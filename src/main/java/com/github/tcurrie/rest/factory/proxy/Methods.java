@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class Methods {
+public interface Methods {
     public interface BeanFactory<U> extends Function<Class<?>, TypeFactory<U>> {
         static <U> Stream<U> map(final Object bean, final BeanFactory<U> factory) {
             return Arrays.stream(bean.getClass().getInterfaces()).flatMap(

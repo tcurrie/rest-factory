@@ -15,7 +15,11 @@ import java.util.function.Function;
 public interface RestParameterAdaptor {
     interface Client extends Function<Object[], String> {
         final class Factory {
-            private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
+            private Factory() {
+                throw RestFactoryException.create("Can not construct instance of Factory class.");
+            }
+
+            private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
             private static final ObjectMapper MAPPER = new ObjectMapper();
             public static Client create(final Method method) {
                 return p -> {
@@ -33,7 +37,11 @@ public interface RestParameterAdaptor {
 
     interface Service extends Function<HttpServletRequest, Object[]> {
         final class Factory {
-            private static final Logger LOGGER = LoggerFactory.getLogger(Service.class);
+            private Factory() {
+                throw RestFactoryException.create("Can not construct instance of Factory class.");
+            }
+
+            private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
             private static final Service NO_ARGUMENT_ADAPTOR = r -> new Object[0];
 
             public static Service create(final Method method) {

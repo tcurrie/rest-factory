@@ -14,7 +14,11 @@ import java.util.function.Consumer;
 public interface RestExceptionAdaptor {
     interface Client {
         class Factory {
-            private static final Logger LOGGER = LoggerFactory.getLogger(Client.class);
+            private Factory() {
+                throw RestFactoryException.create("Can not construct instance of Factory class.");
+            }
+
+            private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
             public static Throwable create(final ExceptionWrapper wrapper) {
                 try {
                     LOGGER.debug("Adapting exception result [{}] from response.", wrapper.getMessage());
@@ -30,8 +34,12 @@ public interface RestExceptionAdaptor {
     }
     interface Service {
         class Factory {
+            private Factory() {
+                throw RestFactoryException.create("Can not construct instance of Factory class.");
+            }
+
             private static final ObjectMapper MAPPER = new ObjectMapper();
-            private static final Logger LOGGER = LoggerFactory.getLogger(Service.class);
+            private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
             public static Consumer<HttpServletResponse> apply(final Throwable throwable) {
                 return response -> {
                     response.setStatus(HttpServletResponse.SC_OK);

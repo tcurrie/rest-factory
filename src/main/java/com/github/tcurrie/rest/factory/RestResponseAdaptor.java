@@ -17,7 +17,11 @@ public interface RestResponseAdaptor {
         T apply(String s) throws Throwable;
 
         final class Factory {
-            private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Client.class);
+            private Factory() {
+                throw RestFactoryException.create("Can not construct instance of Factory class.");
+            }
+
+            private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Factory.class);
             private static final ObjectMapper MAPPER = new ObjectMapper();
 
             public static <T> Client<T> create(final Method method) {
@@ -52,7 +56,11 @@ public interface RestResponseAdaptor {
 
     interface Service<T>  extends Function<T, Consumer<HttpServletResponse>> {
         final class Factory {
-            private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Service.class);
+            private Factory() {
+                throw RestFactoryException.create("Can not construct instance of Factory class.");
+            }
+
+            private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Factory.class);
             private static final ObjectMapper MAPPER = new ObjectMapper();
 
             public static <T> Service<T> create() {

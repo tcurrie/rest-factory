@@ -13,7 +13,11 @@ import java.util.function.Function;
 
 public interface JsonAdaptor extends Function<Reader, Object[]> {
     class Factory {
-        private static final Logger LOGGER = LoggerFactory.getLogger(JsonAdaptor.class);
+        private Factory() {
+            throw RestFactoryException.create("Can not construct instance of Factory class.");
+        }
+
+        private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
         private static final ObjectMapper MAPPER = new ObjectMapper();
 
         public static JsonAdaptor create(final Class<?>[] parameterTypes) {
