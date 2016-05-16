@@ -13,9 +13,9 @@ public class RestUriFactory {
     private RestUriFactory() {
     }
 
-    public <T> Supplier<String> create(final Supplier<String> urlSupplier, final Class<T> service, final Method method) {
+    public <T> RestUri create(final Supplier<String> urlSupplier, final Class<T> service, final Method method) {
         final String methodUri = create(service, method);
-        return () -> removeSlash(urlSupplier.get()) + methodUri;
+        return RestUri.create(() -> removeSlash(urlSupplier.get()), methodUri);
     }
 
     String removeSlash(final String url) {

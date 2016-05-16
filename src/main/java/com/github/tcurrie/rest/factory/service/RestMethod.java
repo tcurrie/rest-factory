@@ -44,6 +44,14 @@ final class RestMethod<T, U> {
         return bean;
     }
 
+    public RestParameterAdaptor.Service getRequestAdaptor() {
+        return requestAdaptor;
+    }
+
+    public RestResponseAdaptor.Service<U> getResponseAdaptor() {
+        return responseAdaptor;
+    }
+
     @SuppressWarnings("unchecked")
     public void invoke(final HttpServletRequest req, final HttpServletResponse resp) {
         LOGGER.info("Invoking [{}]", uri);

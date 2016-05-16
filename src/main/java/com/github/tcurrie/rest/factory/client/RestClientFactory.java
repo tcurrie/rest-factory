@@ -2,6 +2,7 @@ package com.github.tcurrie.rest.factory.client;
 
 import com.github.tcurrie.rest.factory.RestParameterAdaptor;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;
+import com.github.tcurrie.rest.factory.RestUri;
 import com.github.tcurrie.rest.factory.RestUriFactory;
 import com.github.tcurrie.rest.factory.model.RestFactoryException;
 import com.github.tcurrie.rest.factory.proxy.ProxyFactory;
@@ -22,7 +23,7 @@ public final class RestClientFactory {
     }
 
     static <T, U> RestClientMethod<U> create(final Class<T> service, final Supplier<String> urlSupplier, final Method method) {
-        final Supplier<String> methodUrlSupplier = RestUriFactory.getInstance().create(urlSupplier, service, method);
+        final RestUri methodUrlSupplier = RestUriFactory.getInstance().create(urlSupplier, service, method);
         final RestParameterAdaptor.Client methodArgs = RestParameterAdaptor.Client.Factory.create(method);
         final RestResponseAdaptor.Client<U> responseAdaptor = RestResponseAdaptor.Client.Factory.create(method);
         return new RestClientMethod<>(method, methodUrlSupplier, methodArgs, responseAdaptor);

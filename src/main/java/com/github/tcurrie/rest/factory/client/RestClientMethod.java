@@ -2,7 +2,10 @@ package com.github.tcurrie.rest.factory.client;
 
 import com.github.tcurrie.rest.factory.RestParameterAdaptor;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;
+import com.github.tcurrie.rest.factory.RestUri;
 import com.github.tcurrie.rest.factory.proxy.ProxyMethod;
+import com.openpojo.business.BusinessIdentity;
+import com.openpojo.business.annotation.BusinessKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -11,17 +14,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.Method;
-import java.util.function.Supplier;
 
 //TODO Remove dependency on Spring's rest template and/or at least handle timeouts!
 class RestClientMethod<T> implements ProxyMethod<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestClientMethod.class);
     private final Method method;
-    private final Supplier<String> methodUrlSupplier;
+    @BusinessKey private final RestUri methodUrlSupplier;
     private final RestParameterAdaptor.Client parameterAdaptor;
     private final RestResponseAdaptor.Client<T> resultAdaptor;
 
-    RestClientMethod(final Method method, final Supplier<String> methodUrlSupplier, final RestParameterAdaptor.Client parameterAdaptor, final RestResponseAdaptor.Client<T> resultAdaptor) {
+    RestClientMethod(final Method method, final RestUri methodUrlSupplier, final RestParameterAdaptor.Client parameterAdaptor, final RestResponseAdaptor.Client<T> resultAdaptor) {
         this.method = method;
         this.methodUrlSupplier = methodUrlSupplier;
         this.parameterAdaptor = parameterAdaptor;
@@ -33,7 +35,7 @@ class RestClientMethod<T> implements ProxyMethod<T> {
         return method;
     }
 
-    Supplier<String> getMethodUrlSupplier() {
+    RestUri getMethodUrlSupplier() {
         return methodUrlSupplier;
     }
 
@@ -41,6 +43,9 @@ class RestClientMethod<T> implements ProxyMethod<T> {
         return parameterAdaptor;
     }
 
+    public RestResponseAdaptor.Client<T> getResultAdaptor() {
+        return resultAdaptor;
+    }
 
     @Override
     public T invoke(final Object[] args) throws Throwable {
@@ -51,5 +56,20 @@ class RestClientMethod<T> implements ProxyMethod<T> {
         final ResponseEntity<String> response = new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(body), String.class);
 
         return resultAdaptor.apply(response.getBody());
+    }
+
+    @Override
+    public int hashCode() {
+        return BusinessIdentity.getHashCode(this);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return BusinessIdentity.areEqual(this, obj);
+    }
+
+    @Override
+    public String toString() {
+        return BusinessIdentity.toString(this);
     }
 }
