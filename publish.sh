@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_TAG == "" ]]; then
     git config --global user.email "builds@travis-ci.com"
