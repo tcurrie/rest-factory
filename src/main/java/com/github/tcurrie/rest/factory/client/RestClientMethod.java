@@ -8,12 +8,11 @@ import com.openpojo.business.BusinessIdentity;
 import com.openpojo.business.annotation.BusinessKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
+
+import static com.github.tcurrie.rest.factory.client.HTTPExchange.Method.POST;
 
 //TODO Remove dependency on Spring's rest template and/or at least handle timeouts!
 class RestClientMethod<T> implements ProxyMethod<T> {
@@ -53,9 +52,9 @@ class RestClientMethod<T> implements ProxyMethod<T> {
         final String body = parameterAdaptor.apply(args);
         LOGGER.info("For method [{}] and args [{}], posting to [{}] with [{}]", method, args, url, body);
 
-        final ResponseEntity<String> response = new RestTemplate().exchange(url, HttpMethod.POST, new HttpEntity<>(body), String.class);
+        final String response = HTTPExchange.execute(url, body, POST, 30, TimeUnit.SECONDS);
 
-        return resultAdaptor.apply(response.getBody());
+        return resultAdaptor.apply(response);
     }
 
     @Override
