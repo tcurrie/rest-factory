@@ -1,4 +1,4 @@
-package com.github.tcurrie.rest.factory.model;
+package com.github.tcurrie.rest.factory.v1;
 
 public class ResponseWrapper<T> {
     private T result;

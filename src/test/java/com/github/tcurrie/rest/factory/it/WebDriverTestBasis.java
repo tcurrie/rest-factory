@@ -3,30 +3,22 @@ package com.github.tcurrie.rest.factory.it;
 import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
-public class WebDriverTestBasis {
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebDriverTestBasis.class);
-    private WebDriver webdriver;
+abstract class WebDriverTestBasis {
+    private WebDriver webDriver;
 
     @Before
-    public void before() {
-        webdriver = new HtmlUnitDriver();
+    public void before() throws InterruptedException {
+        webDriver = WebDriverCache.getInstance().borrow();
     }
 
     @After
     public void after() {
-        try {
-            webdriver.quit();
-        } catch (final Exception e) {
-            LOGGER.debug("Webdriver failed to quit.", e);
-        }
+        WebDriverCache.getInstance().remit(webDriver);
     }
 
-    protected WebDriver getWebdriver() {
-        return webdriver;
+    WebDriver getWebdriver() {
+        return webDriver;
     }
 }

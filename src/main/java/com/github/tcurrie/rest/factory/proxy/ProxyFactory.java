@@ -1,6 +1,6 @@
 package com.github.tcurrie.rest.factory.proxy;
 
-import com.github.tcurrie.rest.factory.model.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 
 import java.lang.reflect.Proxy;
 

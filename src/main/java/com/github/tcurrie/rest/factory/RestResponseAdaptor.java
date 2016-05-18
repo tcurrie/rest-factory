@@ -2,8 +2,9 @@ package com.github.tcurrie.rest.factory;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tcurrie.rest.factory.model.ResponseWrapper;
-import com.github.tcurrie.rest.factory.model.RestFactoryException;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.github.tcurrie.rest.factory.v1.ResponseWrapper;
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,16 +24,17 @@ public interface RestResponseAdaptor {
 
             private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Factory.class);
             private static final ObjectMapper MAPPER = new ObjectMapper();
+            private static final TypeFactory TYPE_FACTORY = MAPPER.getTypeFactory();
 
             public static <T> Client<T> create(final Method method) {
                 @SuppressWarnings("unchecked")
                 final Class<T> methodResult = (Class<T>) method.getReturnType();
                 final JavaType type;
                 if (void.class.equals(methodResult)) {
-                    type = new ObjectMapper().getTypeFactory().constructParametrizedType(ResponseWrapper.class, ResponseWrapper.class, Object.class);
+                    type = TYPE_FACTORY.constructParametrizedType(ResponseWrapper.class, ResponseWrapper.class, Object.class);
                 } else {
-                    type = new ObjectMapper().getTypeFactory().constructParametrizedType(ResponseWrapper.class, ResponseWrapper.class,
-                            new ObjectMapper().getTypeFactory().constructType(method.getGenericReturnType()));
+                    type = TYPE_FACTORY.constructParametrizedType(ResponseWrapper.class, ResponseWrapper.class,
+                            TYPE_FACTORY.constructType(method.getGenericReturnType()));
                 }
 
                 return result -> {

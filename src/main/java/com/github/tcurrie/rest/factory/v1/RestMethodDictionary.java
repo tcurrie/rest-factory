@@ -1,4 +1,4 @@
-package com.github.tcurrie.rest.factory.service;
+package com.github.tcurrie.rest.factory.v1;
 
 import com.openpojo.business.BusinessIdentity;
 import com.openpojo.business.annotation.BusinessKey;
@@ -13,9 +13,10 @@ public interface RestMethodDictionary {
         private String method;
         private String bean;
 
-        public static MethodDescription create(final RestMethod h) {
-            return new MethodDescription(h.getUri(), h.getMethod().getName(), h.getBean().getClass().getCanonicalName());
+        public static MethodDescription create(final String uri, final String method, final String bean) {
+            return new MethodDescription(uri, method, bean);
         }
+
         private MethodDescription() {}
 
         private MethodDescription(final String uri, final String method, final String bean) {

@@ -1,9 +1,9 @@
 package com.github.tcurrie.rest.factory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tcurrie.rest.factory.model.ExceptionWrapper;
-import com.github.tcurrie.rest.factory.model.ResponseWrapper;
-import com.github.tcurrie.rest.factory.model.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.ExceptionWrapper;
+import com.github.tcurrie.rest.factory.v1.ResponseWrapper;
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

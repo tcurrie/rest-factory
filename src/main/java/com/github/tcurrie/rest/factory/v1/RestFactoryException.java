@@ -1,4 +1,4 @@
-package com.github.tcurrie.rest.factory.model;
+package com.github.tcurrie.rest.factory.v1;
 
 public final class RestFactoryException extends RuntimeException {
     public static RestFactoryException create(final String message) {

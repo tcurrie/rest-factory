@@ -1,19 +1,22 @@
 package com.github.tcurrie.rest.factory.service;
 
 import com.github.tcurrie.rest.factory.Strings;
-import com.github.tcurrie.rest.factory.model.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.RestMethodDictionary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 final class UriSetRestHandlerDictionary implements RestMethodDictionary {
     // TODO Replace with node search for speed
     private static final Logger LOGGER = LoggerFactory.getLogger(UriSetRestHandlerDictionary.class);
+    private static final Function<RestMethod, MethodDescription> METHOD_TO_DESCRIPTION = h -> MethodDescription.create(h.getUri(), h.getMethod().getName(), h.getBean().getClass().getCanonicalName());
     private final Set<RestMethod> handlers;
 
     static UriSetRestHandlerDictionary create(final Stream<RestMethod> handlers) {
@@ -29,7 +32,7 @@ final class UriSetRestHandlerDictionary implements RestMethodDictionary {
 
     @Override
     public Set<MethodDescription> getMethods() {
-        return handlers.stream().map(MethodDescription::create).collect(Collectors.toSet());
+        return handlers.stream().map(METHOD_TO_DESCRIPTION).collect(Collectors.toSet());
     }
 
     RestMethod getHandler(final HttpServletRequest req) {

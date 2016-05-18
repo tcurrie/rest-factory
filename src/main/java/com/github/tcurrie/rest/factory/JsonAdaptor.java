@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tcurrie.rest.factory.model.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,17 +18,15 @@ import java.util.stream.Collectors;
 
 public interface JsonAdaptor extends Function<Reader, Object[]> {
     class Factory {
-
-        private static final Predicate<Class<?>> IS_NOT_INTERFACE = p -> !p.isInterface();
-        private static final Predicate<Class<?>> IS_NOT_ARRAY = (t1) -> !t1.isArray();
-        private static final Predicate<Class<?>> IS_NOT_PRIMITIVE = (t) -> !t.isPrimitive();
-
         private Factory() {
             throw RestFactoryException.create("Can not construct instance of Factory class.");
         }
 
         private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
         private static final ObjectMapper MAPPER = new ObjectMapper();
+        private static final Predicate<Class<?>> IS_NOT_INTERFACE = p -> !p.isInterface();
+        private static final Predicate<Class<?>> IS_NOT_ARRAY = (t1) -> !t1.isArray();
+        private static final Predicate<Class<?>> IS_NOT_PRIMITIVE = (t) -> !t.isPrimitive();
 
         public static JsonAdaptor create(final Method method) {
             final Class<?>[] parameterTypes = method.getParameterTypes();

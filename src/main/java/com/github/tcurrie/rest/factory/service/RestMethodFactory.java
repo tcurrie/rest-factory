@@ -1,7 +1,7 @@
 package com.github.tcurrie.rest.factory.service;
 
 
-import com.github.tcurrie.rest.factory.model.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import com.github.tcurrie.rest.factory.proxy.Methods;
 import com.github.tcurrie.rest.factory.RestParameterAdaptor;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;

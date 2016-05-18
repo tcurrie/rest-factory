@@ -1,6 +1,6 @@
 package com.github.tcurrie.rest.factory;
 
-import com.github.tcurrie.rest.factory.model.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import org.slf4j.helpers.MessageFormatter;
 
 import java.io.PrintWriter;

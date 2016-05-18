@@ -13,7 +13,7 @@ public class RestUri implements Supplier<String> {
         return new RestUri(urlSupplier, methodUri);
     }
 
-    public RestUri(final Supplier<String> urlSupplier, final String methodUri) {
+    private RestUri(final Supplier<String> urlSupplier, final String methodUri) {
         this.urlSupplier = urlSupplier;
         this.methodUri = methodUri;
     }
