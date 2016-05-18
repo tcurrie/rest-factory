@@ -1,17 +1,13 @@
-branches:
-  except:
-  - travis
 language: java
 jdk: oraclejdk8
 before_install:
 - mvn versions:set -DnewVersion=$VERSION
 script: mvn verify jacoco:report coveralls:report
 after_success:
-- git tag $VERSION -a -m "Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
-- git push origin --tags
+  on:
+    tags: false
+    branches: master
 - git clone -b travis `git config --get remote.origin.url` $DEPLOY
-- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in $DEPLOY/pubring.gpg.enc -out $DEPLOY/pubring.gpg -d
-- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in $DEPLOY/secring.gpg.enc -out $DEPLOY/secring.gpg -d
 - $DEPLOY/publish.sh
 env:
   global:
@@ -23,3 +19,6 @@ env:
   - secure: YBDmIu2nGSn2mYcqOuO4WJIWEJ7M1FftboKo/NEIkCIeQE0MSc26veRVkvncLC3oJqAMuRP+OWCk26FyTR+OvRtCLh/JiqYYIGYp0KBeKt0hlbs5t1uHIlGqOx1aVMIu/N+5mavjbYjUvMtZQpDcVjxk2SS3roiupWpUAd4i5ZY6rXNY7QptvwDfM+WKw//FUQe98LOg6ecFLnnJgv9zf8ZD9p4YCV0ywxvdVgevmzQAbkNyHwQsQi3oro54GwK7G6EeXWSwuysm/nAknVgfS5DbMpza6nHLSumOaokaPQ1yheGRu8UF6omk3JQyPqOrllD6HEOHgzH29LUtWjcgCYV8CUvQ/FVvj50JukpyGmwLoZ/eNWrpqhoWAYRpuraCuDNO2hteg3/iATp4u+h0iGy1tm4SC8KsDO3TCiGHYthvvR7m3UmzxNopVxLUOei7cTp7JmhZlm5yaQnow6DzMA1Ev8hx54BavaGg5AIOCO3C+4vnaLlWyT8pT8W+0nWawD2255zJDuNpQLAhg0ENLLtHfPECrcOa/DmSIz2dClKw7JlEkYr7Zg7NVIPRb0A2v173IVqp6GSbA94mia5MOoDofpDX3nHbWLecp6p48Bi0KWr2Oyer7OYRmpn7j2YDgm04fkQDpwMx8oGj/X4yKlj3P/9KQa9hPlrY09fkCwU=
   - secure: jtvEeJmgh3mlV7wEdxldGDLOFZq/u4sSsSvZlIWAWV1x/7qzysdElKSGN2rhlu0UTv6hFU7Pal++CYaXVS1UNOBBw8xP2HMy7QfCckyVVaHw8yiLaO0TiOwQF/C1bOllOh6FpmYBz4ftvL8djtko/d7GGcOXFwuRMHG3qp3xeWzAqv4fYAlFeJl/ts0ZjlfFoQNeWmEr+utakud+k42halvE7N9NMtLGY/00JbRBQgyWn5anrQmvGI5zid64ORNFmHxxFUiSnq6RY/cxiRY6OgKojsqpyvA72euIj6ZkVWWZu+gj2MVLXivCmunDBVQCubDeQMjF0cTuPNPrGVyLdgwL/OzyT9FLRmnn9rFVlRWxP6sIjVnihByAIZPJx83SgesFmSauY6qcMZtw3OFLPGEA5NkE5AccZ5YTeLXjiKEldQokO59nFScBYN2MHGJtnQcujeDSAVwyrDbK2RWx75+S11UzPMFYtackdx6/X8yOEsJebaTU5Y224tArv+CXAObB5Ja3mb68OHKh7nk2apFhD5XhGcR0Wl/z5eefyu6lUC1qDZgucN/zKZMXd9t1PYwGMuDw/EiHM1+AwKkM58ZYUO3hoewr8Wn7XIFgn3abC4VUzfnMYfEE+5ioC2Hw30E/t6ZuwN8pv19ZzI0JtxABcnHR/Y15o2FC5EQLy2c=
   - secure: Mo/JlwRSZJJ9WBHXhaIlobW2b8PBcWfy5heMfHWHxF2t65/OBwFyj48BH79/DErNmGeHATmMjqDjZNYTND+O0YmIs6b7PNwZ35B74PpnfJ0SzO3jiE5K/B/UTQJpNzxv4K69JmArsfxhqVngidd6XPteRw15L067K0u46G8KUd+QMuSj+DCg+ebe0xspgGWMooap7NlgbC4y0k7VkZYasazIEuWy++bx2y52pYJZ2N+ve8yQXEZ2RXU1UxxpSHSkDiR4uqK2WLi72B9NpJluJi8TJ5Qz2Y94ATbrCwYEouFjl1Li5Pk0V4L7ibn6C0HsfrgWp0thPdBLXhoH3Bx5W+Q0KSEBcKD0iTep5gBIxOoFQa9vI3s7hz/Y+GbnSEQXVumXYITigqOmEUlhAuPDkjTVIJpJPn6NNK9y79NuFyBauD6K9pU2mYh/vQIx89mjIrLWs8WmYA+eKuHGof2G4t0uhfML+8HRgDyT6K/0JEMpoqx4b/JJYMBJawq/PAYUH6+dC3ix6W0HN9WPznLWZCN9/ff7OlOcEvSD/Bq1FIsN6ER4syhsBY9PQG9lPnzKqUfFXBfGAUhob60JdYJ5zGAjSWvQPicj6oE7lPdUZAc0qDOj+rzG2DquDfDXRTpUOf2LHZistZxl1M3RpTGH1OYuGgdUYYDC7aYcd7zGrKs=
+branches:
+  except:
+    - /^*-v[0-9]/
