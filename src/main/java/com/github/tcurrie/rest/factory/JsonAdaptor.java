@@ -8,7 +8,6 @@ import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Reader;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public interface JsonAdaptor extends Function<Reader, Object[]> {
+public interface JsonAdaptor extends Function<String, Object[]> {
     class Factory {
         private Factory() {
             throw RestFactoryException.create("Can not construct instance of Factory class.");

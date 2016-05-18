@@ -6,9 +6,6 @@ import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.Reader;
 import java.lang.reflect.Method;
 import java.util.function.Function;
 
@@ -24,7 +21,9 @@ public interface RestParameterAdaptor {
             public static Client create(final Method method) {
                 return p -> {
                     try {
-                        return MAPPER.writeValueAsString(p);
+                        final String s = MAPPER.writeValueAsString(p);
+                        LOGGER.info("Mapped [{}] to [{}].", p, s);
+                        return s;
                     } catch (final JsonProcessingException e) {
                         LOGGER.warn("Failed to map [{}] for method [{}].", p, method, e);
                         throw RestFactoryException.create(Strings.format("Failed to map [{}] for method [{}].", p, method), e);
@@ -35,7 +34,7 @@ public interface RestParameterAdaptor {
     }
 
 
-    interface Service extends Function<HttpServletRequest, Object[]> {
+    interface Service extends Function<String, Object[]> {
         final class Factory {
             private Factory() {
                 throw RestFactoryException.create("Can not construct instance of Factory class.");
@@ -48,15 +47,8 @@ public interface RestParameterAdaptor {
                 if (method.getParameterCount() == 0) {
                     return NO_ARGUMENT_ADAPTOR;
                 } else {
-                    final Function<Reader, Object[]> parser = JsonAdaptor.Factory.create(method);
-                    return r -> {
-                        try {
-                            return parser.apply(r.getReader());
-                        } catch (final IOException e) {
-                            LOGGER.warn("Failed to read arguments for method [{}].", method, e);
-                            throw RestFactoryException.create(Strings.format("Failed to read arguments for method [{}].", method), e);
-                        }
-                    };
+                    final JsonAdaptor parser = JsonAdaptor.Factory.create(method);
+                    return r -> parser.apply(r);
                 }
             }
         }

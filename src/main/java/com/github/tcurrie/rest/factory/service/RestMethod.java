@@ -10,9 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 final class RestMethod<T, U> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestMethod.class);
@@ -56,7 +58,7 @@ final class RestMethod<T, U> {
     public void invoke(final HttpServletRequest req, final HttpServletResponse resp) {
         LOGGER.info("Invoking [{}]", uri);
         try {
-            final Object[] args = requestAdaptor.apply(req);
+            final Object[] args = requestAdaptor.apply(read(req));
             LOGGER.info("Parsed Args [{}]", Arrays.asList(args));
             final U result = (U) method.invoke(bean, args);
             LOGGER.info("Got Result [{}]", result);
@@ -70,10 +72,19 @@ final class RestMethod<T, U> {
         }
     }
 
+    private String read(final HttpServletRequest req) throws IOException {
+        return req.getReader().lines().collect(Collectors.joining("\n"));
+    }
+
     public void echo(final HttpServletRequest req, final HttpServletResponse resp) {
-        final Object[] args = requestAdaptor.apply(req);
-        LOGGER.info("Parsed Args [{}]", Arrays.asList(args));
-        ECHO_ADAPTOR.apply(args).accept(resp);
+        try {
+            final Object[] args = requestAdaptor.apply(read(req));
+            LOGGER.info("Parsed Args [{}]", Arrays.asList(args));
+            ECHO_ADAPTOR.apply(args).accept(resp);
+        } catch (final Exception e) {
+            LOGGER.warn("Failed to invoke: {}", uri, e);
+            RestExceptionAdaptor.Service.Factory.apply(e).accept(resp);
+        }
     }
 
     @Override
