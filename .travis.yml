@@ -4,9 +4,6 @@ before_install:
 - mvn versions:set -DnewVersion=$VERSION
 script: mvn verify jacoco:report coveralls:report
 after_success:
-  on:
-    tags: false
-    branches: master
 - git clone -b travis `git config --get remote.origin.url` $DEPLOY
 - $DEPLOY/publish.sh
 env:
