@@ -74,7 +74,6 @@ public class ConsumerIT {
 
         final String body = HTTPExchange.execute(methodUrl, parameters, ECHO, 30, TimeUnit.SECONDS);
 
-        System.out.println(body);
         final JavaType type = TYPE_FACTORY.constructParametrizedType(ResponseWrapper.class, ResponseWrapper.class, Pojo[].class);
         final ResponseWrapper<Pojo[]> wrapper = MAPPER.readValue(body, type);
 

@@ -12,10 +12,7 @@ public class EmbeddedServer {
     public EmbeddedServer(final int port) {
         tomcat = new Tomcat();
         tomcat.setPort(port);
-
-        final File tempBaseDir = getTempBaseDir();
-        System.out.println("Setting temp tomcat home to: " + tempBaseDir);
-        tomcat.setBaseDir(tempBaseDir.getAbsolutePath());
+        tomcat.setBaseDir(getTempBaseDir().getAbsolutePath());
     }
 
     public static EmbeddedServer on(final int port) {

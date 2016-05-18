@@ -2,7 +2,6 @@ package com.github.tcurrie.rest.factory.client;
 
 import com.github.tcurrie.rest.factory.Strings;
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
-import com.openpojo.reflection.PojoClass;
 import com.openpojo.reflection.PojoField;
 import com.openpojo.reflection.impl.PojoClassFactory;
 
@@ -16,6 +15,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public final class HTTPExchange {
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    private static final PojoField CONNECTION_METHOD = PojoClassFactory.getPojoClass(HttpURLConnection.class).getPojoFields().stream().filter(f -> f.getName().equals("method")).findFirst().get();
+
     private HTTPExchange() {
         throw RestFactoryException.create("Can not construct instance of Factory class.");
     }
@@ -49,9 +51,13 @@ public final class HTTPExchange {
                 out.writeBytes(body);
             }
 
-            PojoClass pc = PojoClassFactory.getPojoClass(HttpURLConnection.class);
-            PojoField pf = pc.getPojoFields().stream().filter(f->f.getName().equals("method")).findFirst().get();
-            pf.set(connection, method.name());
+            /**
+             *  In order to override the HttpURLConnection method type constraints,
+             *  the field value must be set directly and it must be done after
+             *  the connection output stream is used.
+             *  TODO Add test for this behavior
+             */
+            CONNECTION_METHOD.set(connection, method.name());
 
             try (final BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
                 return in.lines().collect(Collectors.joining("\n"));

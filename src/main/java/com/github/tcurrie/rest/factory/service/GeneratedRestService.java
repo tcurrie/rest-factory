@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Map;
 
 public final class GeneratedRestService extends HttpServlet {
@@ -20,14 +19,11 @@ public final class GeneratedRestService extends HttpServlet {
 
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
-        System.out.println("\n\n\nDO GET\n\n\n");
         configuration.getHandler(req).invoke(req, resp);
     }
 
     @Override
     protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
-        System.out.println("\n\n\nDO POST\n\n\n");
-
         configuration.getHandler(req).invoke(req, resp);
     }
 
@@ -50,13 +46,6 @@ public final class GeneratedRestService extends HttpServlet {
         if("ECHO".equals(req.getMethod())) {
             doEcho(req, resp);
         } else {
-            System.out.println(req.getMethod());
-            Enumeration<String> headers = req.getHeaderNames();
-            while (headers.hasMoreElements()) {
-                String name = headers.nextElement();
-                String value = req.getHeader(name);
-                System.out.println(name + "=" + value);
-            }
             super.service(req, resp);
         }
     }
