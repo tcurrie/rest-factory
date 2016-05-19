@@ -5,6 +5,8 @@ before_install:
 script: mvn verify jacoco:report coveralls:report
 after_success:
 - git clone -b travis `git config --get remote.origin.url` $DEPLOY
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in $DEPLOY/pubring.gpg.enc -out $DEPLOY/pubring.gpg -d
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in $DEPLOY/secring.gpg.enc -out $DEPLOY/secring.gpg -d
 - $DEPLOY/publish.sh
 env:
   global:
