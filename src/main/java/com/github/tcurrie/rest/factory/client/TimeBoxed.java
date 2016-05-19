@@ -20,7 +20,7 @@ final class TimeBoxed {
         try {
             return future.get(timeout, timeUnit);
         } catch (final Exception e) {
-            throw RestFactoryException.create("", e);
+            throw RestFactoryException.create("Failed to complete task.", e);
         } finally {
             executor.shutdownNow();
         }
