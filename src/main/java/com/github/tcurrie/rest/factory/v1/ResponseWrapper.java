@@ -10,7 +10,7 @@ public class ResponseWrapper<T> {
     }
 
 
-    public static ResponseWrapper<?> createException(final ExceptionWrapper exception) {
+    public static ResponseWrapper<Void> createException(final ExceptionWrapper exception) {
         return new ResponseWrapper<>(exception, false);
     }
 

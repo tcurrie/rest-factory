@@ -44,23 +44,13 @@ public class RestParameterAdaptorTest {
     }
 
     @Test
-    public void testFailToReacData() throws NoSuchMethodException {
+    public void testFailToReacdData() throws NoSuchMethodException {
         final Method method = TestApi.class.getMethod("dedup", Pojo[].class);
 
         try {
             RestParameterAdaptor.Service.Factory.create(method).apply("");
         } catch (final RestFactoryException e) {
             Assert.assertThat(e.getMessage(), CoreMatchers.startsWith("Failed to read arguments, got [[null]]."));
-        }
-    }
-
-
-
-    private static class Looper {
-        private Looper looper;
-
-        public void setLooper(final Looper looper) {
-            this.looper = looper;
         }
     }
 }

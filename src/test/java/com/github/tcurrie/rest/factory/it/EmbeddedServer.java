@@ -5,19 +5,23 @@ import org.apache.catalina.startup.Tomcat;
 
 import javax.servlet.ServletException;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class EmbeddedServer {
     private final Tomcat tomcat;
 
-    public EmbeddedServer(final int port) {
-        tomcat = new Tomcat();
-        tomcat.setPort(port);
-        tomcat.setBaseDir(getTempBaseDir().getAbsolutePath());
-    }
-
-    public static EmbeddedServer on(final int port) {
+    public static EmbeddedServer create(final int port) {
         return new EmbeddedServer(port);
     }
+
+    private EmbeddedServer(final int port) {
+        tomcat = new Tomcat();
+        tomcat.setPort(port);
+        tomcat.setBaseDir(createTempDir().toString());
+    }
+
 
     public void deploy(final String war, final String contextPath) {
         try {
@@ -28,7 +32,6 @@ public class EmbeddedServer {
     }
 
     public EmbeddedServer start() {
-
         try {
             tomcat.start();
         } catch (final LifecycleException e) {
@@ -47,24 +50,13 @@ public class EmbeddedServer {
         return this;
     }
 
-    private File getTempBaseDir() {
-        return createTempDirectory("tomcat");
-    }
-
-    private static final int TEMP_DIR_ATTEMPTS = 100;
-
-    private File createTempDirectory(final String prefix) {
-        final File baseDir = new File(System.getProperty("java.io.tmpdir"));
-        final String baseName = prefix + "-" + System.nanoTime() + "-";
-
-        for (int counter = 0; counter < TEMP_DIR_ATTEMPTS; counter++) {
-            final File tempDir = new File(baseDir, baseName + counter);
-            if (tempDir.mkdir()) {
-                return tempDir;
-            }
+    private Path createTempDir() {
+        try {
+            final Path path = Files.createTempDirectory("EmbeddedServer");
+            path.toFile().deleteOnExit();
+            return path;
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
-        throw new IllegalStateException("Failed to create directory within "
-                + TEMP_DIR_ATTEMPTS + " attempts (tried "
-                + baseName + "0 to " + baseName + (TEMP_DIR_ATTEMPTS - 1) + ')');
     }
 }

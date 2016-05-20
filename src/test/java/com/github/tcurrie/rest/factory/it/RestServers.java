@@ -5,27 +5,30 @@ public enum RestServers {
     private final String contextPath;
 
     RestServers(final String contextPath) {
-        RewriteServer.SERVER.deploy(RewriteServer.WAR, contextPath);
+        Server.SERVER.deploy(Server.WAR, contextPath);
         this.contextPath = contextPath;
     }
+
     public String getUrl() {
-        return RewriteServer.BASE_URL + contextPath;
+        return Server.BASE_URL + contextPath;
     }
-    private interface RewriteServer {
+
+    private interface Server {
          int PORT = Integer.parseInt(System.getProperty("test.port", "9090"));
          String BASE_URL = System.getProperty("test.host", "http://localhost:" + PORT);
-         String WAR = System.getProperty("test.war", RewriteServer.class.getResource("/webapp/").getPath());
-         EmbeddedServer SERVER = EmbeddedServer.on(PORT);
+         String WAR = System.getProperty("test.war", Server.class.getResource("/webapp/").getPath());
+         EmbeddedServer SERVER = EmbeddedServer.create(PORT);
     }
+
     static {
-        RewriteServer.SERVER.start();
+        Server.SERVER.start();
         Runtime.getRuntime().addShutdownHook(new ServerShutdownHook());
     }
 
     private static class ServerShutdownHook extends Thread {
         @Override
         public void run() {
-            RewriteServer.SERVER.stop();
+            Server.SERVER.stop();
         }
     }
 }

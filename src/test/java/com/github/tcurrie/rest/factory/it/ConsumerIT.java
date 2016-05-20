@@ -87,7 +87,6 @@ public class ConsumerIT {
         tryMethod(DELETE);
     }
 
-
     @Test
     public void testConsumesPojoWithEcho() throws IOException {
         final Pojo expected = RandomFactory.getRandomValue(Pojo.class);

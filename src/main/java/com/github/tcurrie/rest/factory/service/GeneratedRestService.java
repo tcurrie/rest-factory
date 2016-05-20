@@ -1,6 +1,5 @@
 package com.github.tcurrie.rest.factory.service;
 
-import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -37,7 +36,7 @@ public final class GeneratedRestService extends HttpServlet {
         configuration.getHandler(req).invoke(req, resp);
     }
 
-    protected void doEcho(final HttpServletRequest req, final HttpServletResponse resp) {
+    private void doEcho(final HttpServletRequest req, final HttpServletResponse resp) {
         configuration.getHandler(req).echo(req, resp);
     }
 
@@ -52,16 +51,11 @@ public final class GeneratedRestService extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        try {
-            LOGGER.info("Beginning Servlet Config.");
-            final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-            final Map<String, Object> beans = applicationContext.getBeansWithAnnotation(RestService.class);
-            LOGGER.info("Got Rest Service Beans[{}]", beans);
-            this.configuration = UriSetRestHandlerDictionary.create(RestMethodFactory.create(beans.values()));
-            LOGGER.info("Mapped rest services [{}]", configuration);
-        } catch (final Exception e) {
-            LOGGER.error("Failed to map Generated Rest Services.", e);
-            throw RestFactoryException.create("Failed to map Generated Rest Services.", e);
-        }
+        LOGGER.info("Beginning Servlet Config.");
+        final WebApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        final Map<String, Object> beans = applicationContext.getBeansWithAnnotation(RestService.class);
+        LOGGER.info("Got Rest Service Beans[{}]", beans);
+        this.configuration = UriSetRestHandlerDictionary.create(RestMethodFactory.create(beans.values()));
+        LOGGER.info("Mapped rest services [{}]", configuration);
     }
 }

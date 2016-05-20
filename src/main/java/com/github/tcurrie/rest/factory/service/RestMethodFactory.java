@@ -1,6 +1,7 @@
 package com.github.tcurrie.rest.factory.service;
 
 
+import com.github.tcurrie.rest.factory.proxy.MethodImplementation;
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import com.github.tcurrie.rest.factory.proxy.Methods;
 import com.github.tcurrie.rest.factory.RestParameterAdaptor;
@@ -29,6 +30,6 @@ final class RestMethodFactory {
         final String uri = RestUriFactory.getInstance().create(type, method);
         final RestParameterAdaptor.Service requestAdaptor = RestParameterAdaptor.Service.Factory.create(method);
         final RestResponseAdaptor.Service<U> resultAdaptor = RestResponseAdaptor.Service.Factory.create();
-        return new RestMethod<>(uri, method, (T) bean, requestAdaptor, resultAdaptor);
+        return new RestMethod<>(uri, MethodImplementation.create((T) bean, method), requestAdaptor, resultAdaptor);
     }
 }

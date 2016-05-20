@@ -3,7 +3,6 @@ package com.github.tcurrie.rest.factory.it.apis;
 import java.util.Set;
 
 public interface TestApi {
-
     void runnable();
     void consumer(Pojo m);
     Pojo producer();

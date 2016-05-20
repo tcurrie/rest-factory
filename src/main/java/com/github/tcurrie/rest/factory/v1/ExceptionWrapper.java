@@ -16,12 +16,12 @@ public class ExceptionWrapper implements Serializable {
     }
 
     private ExceptionWrapper(final Class<?> exceptionType, final String message, final String stackTrace) {
-        this();
         this.exceptionType = exceptionType;
         this.message = message;
         this.stackTrace = stackTrace;
     }
 
+    @SuppressWarnings("unused")
     private ExceptionWrapper() {}
 
     public String getStackTrace() {

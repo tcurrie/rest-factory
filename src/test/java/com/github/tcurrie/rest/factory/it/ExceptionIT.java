@@ -1,7 +1,12 @@
 package com.github.tcurrie.rest.factory.it;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import com.github.tcurrie.rest.factory.Strings;
+import com.github.tcurrie.rest.factory.client.HTTPExchange;
 import com.github.tcurrie.rest.factory.client.RestClientFactory;
+import com.github.tcurrie.rest.factory.it.apis.Pojo;
 import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.github.tcurrie.rest.factory.it.impls.TestService;
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
@@ -10,12 +15,21 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Method;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
+import static com.github.tcurrie.rest.factory.client.HTTPExchange.Method.ECHO;
+import static com.github.tcurrie.rest.factory.client.HTTPExchange.Method.POST;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class ExceptionIT {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private TestApi client;
 
@@ -67,6 +81,7 @@ public class ExceptionIT {
             Unbuildable.class.getConstructor(String.class, Throwable.class);
             throw new RuntimeException();
         } catch (NoSuchMethodException e) {
+            //noinspection ThrowableResultOfMethodCallIgnored
             expected = RestFactoryException.create(Strings.format("Failed to adapt exception [{}] from response.", Strings.getStackTrace(unbuildable)), e);
         }
 
@@ -79,4 +94,41 @@ public class ExceptionIT {
             assertThat(actual.getCause().getMessage(), is(expected.getCause().getMessage()));
         }
     }
+
+    @Test
+    public void testThrowsExceptionForUnknownMethod() throws JsonProcessingException {
+        final Pojo expected = RandomFactory.getRandomValue(Pojo.class);
+        TestService.DATA.put("consumed", RandomFactory.getRandomValue(Pojo.class));
+
+        final String methodUrl = RestServers.SERVER.getUrl() + "/spring-generated-rest/test-api/v1/unknown";
+        final String parameters = MAPPER.writeValueAsString(expected);
+
+        try {
+            final String result = HTTPExchange.execute(methodUrl, parameters, POST, 30, TimeUnit.SECONDS);
+            fail("Should have thrown exception, got[" + result  +"]");
+        } catch (final RestFactoryException e) {
+            assertThat(e.getMessage(), startsWith("Failed to complete task."));
+            assertThat(e.getCause(), instanceOf(ExecutionException.class));
+            assertThat(e.getCause().getCause().getMessage(), startsWith("Failed to execute HTTPExchange, url[http://localhost:9090/spring/spring-generated-rest/test-api/v1/unknown], body["));
+        }
+    }
+
+    @Test
+    public void testEchoThrowsExceptionForInvalidParameters() throws Throwable {
+        TestService.DATA.put("consumed", RandomFactory.getRandomValue(Pojo.class));
+        final Method method = TestApi.class.getMethod("consumer", Pojo.class);
+
+        final String methodUrl = RestServers.SERVER.getUrl() + "/spring-generated-rest/test-api/v1/consumer";
+        final String parameters = MAPPER.writeValueAsString("invalid");
+
+        final String result = HTTPExchange.execute(methodUrl, parameters, ECHO, 30, TimeUnit.SECONDS);
+
+        try {
+            RestResponseAdaptor.Client.Factory.create(method).apply(result);
+            fail("Should have thrown exception, got[" + result  +"]");
+        } catch (final RestFactoryException e) {
+            assertThat(e.getMessage(), startsWith("Failed to adapt exception [com.github.tcurrie.rest.factory.v1.RestFactoryException: Failed to read arguments, got [[null]]."));
+        }
+    }
+
 }

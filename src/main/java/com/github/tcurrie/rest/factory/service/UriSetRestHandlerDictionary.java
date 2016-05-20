@@ -16,7 +16,8 @@ import java.util.stream.Stream;
 final class UriSetRestHandlerDictionary implements RestMethodDictionary {
     // TODO Replace with node search for speed
     private static final Logger LOGGER = LoggerFactory.getLogger(UriSetRestHandlerDictionary.class);
-    private static final Function<RestMethod, MethodDescription> METHOD_TO_DESCRIPTION = h -> MethodDescription.create(h.getUri(), h.getMethod().getName(), h.getBean().getClass().getCanonicalName());
+    private static final Function<RestMethod, MethodDescription> METHOD_TO_DESCRIPTION = h -> MethodDescription.create(h.getUri(),
+            h.getImplementation().getMethodName(), h.getImplementation().getBeanName());
     private final Set<RestMethod> handlers;
 
     static UriSetRestHandlerDictionary create(final Stream<RestMethod> handlers) {
