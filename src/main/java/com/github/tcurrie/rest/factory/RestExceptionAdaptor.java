@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Function;
 
-public interface RestExceptionAdaptor {
+interface RestExceptionAdaptor {
     interface Client {
         class Factory {
             private Factory() {
-                throw RestFactoryException.create("Can not construct instance of Factory class.");
+                throw new RestFactoryException("Can not construct instance of Factory class.");
             }
 
             private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
@@ -22,8 +22,9 @@ public interface RestExceptionAdaptor {
                             wrapper.getExceptionType().getConstructor(String.class).newInstance(wrapper.getStackTrace())
                     );
                 } catch (final Exception e) {
+                    e.printStackTrace();
                     LOGGER.warn("Failed to adapt exception [{}] from response.", wrapper.getStackTrace(), e);
-                    throw RestFactoryException.create(Strings.format("Failed to adapt exception [{}] from response.", wrapper.getStackTrace()), e);
+                    throw new RestFactoryException(Strings.format("Failed to adapt exception [{}] from response.", wrapper.getStackTrace()), e);
                 }
             }
         }

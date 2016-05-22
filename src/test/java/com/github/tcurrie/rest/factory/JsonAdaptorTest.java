@@ -27,7 +27,7 @@ public class JsonAdaptorTest {
         private Unbuildable(final int unused) {
 
         }
-        @SuppressWarnings({"unused", "WeakerAccess"})
+        @SuppressWarnings({"unused", "WeakerAccess", "EmptyMethod"})
         public void unAdaptable(final Unbuildable u) {
         }
     }

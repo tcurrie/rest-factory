@@ -32,7 +32,7 @@ public final class MethodImplementation<T, U> {
     }
 
     public String getBeanName() {
-        return bean.getClass().getCanonicalName();
+        return method.getDeclaringClass().getCanonicalName();
     }
 
     @Override

@@ -69,7 +69,7 @@ public class Cache<T> {
             LOGGER.debug("Failed clean termination.", e);
         }
         this.creators.shutdownNow();
-        created.forEach(cleaner::accept);
+        created.forEach(cleaner);
     }
 
     public T borrow() {

@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 public class FactoryStructuralTest {
 
-    private static final int EXPECTED_FACTORIES_DECLARED = 13;
+    private static final int EXPECTED_FACTORIES_DECLARED = 14;
     private static final Predicate<PojoClass> HAS_NO_INSTANCE_METHODS = p -> p.getPojoMethods().stream().noneMatch(m -> !m.isStatic() && !m.isConstructor());
     private static final Predicate<PojoClass> IS_NOT_INTERFACE = p -> !p.isInterface();
     private static final Predicate<PojoClass> IS_NOT_THROWABLE = p -> !Throwable.class.isAssignableFrom(p.getClazz());

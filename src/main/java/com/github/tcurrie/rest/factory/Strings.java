@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public final class Strings {
     private Strings() {
-        throw RestFactoryException.create("Can not construct instance of Factory class.");
+        throw new RestFactoryException("Can not construct instance of Factory class.");
     }
 
     public static String format(final String message, final Object... parameters) {

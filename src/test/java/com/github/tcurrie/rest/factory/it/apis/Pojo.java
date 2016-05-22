@@ -25,19 +25,12 @@ public class Pojo implements Serializable {
         return value;
     }
 
-    public void setValue(final String value) {
-        this.value = value;
-    }
-
     public int[] getData() {
         return data;
     }
 
-    public void setData(final int[] data) {
-        this.data = data;
-    }
 
-
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(final Object o) {
         return BusinessIdentity.areEqual(this, o);

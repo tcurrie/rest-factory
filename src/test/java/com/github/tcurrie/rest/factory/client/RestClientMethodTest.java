@@ -41,7 +41,7 @@ public class RestClientMethodTest {
     public void testToString() {
         final String uri = RandomFactory.getRandomValue(String.class);
         final String baseUrl = RandomFactory.getRandomValue(String.class);
-        final RestClientMethod restMethod = new RestClientMethod(null, RestUri.create(()->baseUrl, uri), null, null);
+        @SuppressWarnings("unchecked") final RestClientMethod restMethod = new RestClientMethod(null, RestUri.create(()->baseUrl, uri), null, null);
         assertThat(restMethod.toString(), CoreMatchers.is(BusinessIdentity.toString(restMethod)));
     }
 
@@ -50,6 +50,7 @@ public class RestClientMethodTest {
         final Method method = Object.class.getMethod("toString");
 
         RandomFactory.addRandomGenerator(new RandomGenerator() {
+            @SuppressWarnings("unchecked")
             @Override
             public Collection<Class<?>> getTypes() {
                 return Arrays.asList(new Class[]{Method.class});

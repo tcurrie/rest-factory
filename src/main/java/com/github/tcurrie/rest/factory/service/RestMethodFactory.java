@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 final class RestMethodFactory {
     private RestMethodFactory() {
-        throw RestFactoryException.create("Can not construct instance of Factory class.");
+        throw new RestFactoryException("Can not construct instance of Factory class.");
     }
 
     static Stream<RestMethod> create(final Collection<Object> beans) {

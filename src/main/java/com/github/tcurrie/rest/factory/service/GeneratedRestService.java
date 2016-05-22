@@ -1,52 +1,35 @@
 package com.github.tcurrie.rest.factory.service;
 
+import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Map;
 
-public final class GeneratedRestService extends HttpServlet {
+public final class GeneratedRestService extends HttpServletBasis {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneratedRestService.class);
+
     private UriSetRestHandlerDictionary configuration;
 
-    @Override
-    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) {
-        configuration.getHandler(req).invoke(req, resp);
-    }
-
-    @Override
-    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) {
-        configuration.getHandler(req).invoke(req, resp);
-    }
-
-    @Override
-    protected void doPut(final HttpServletRequest req, final HttpServletResponse resp) {
-        configuration.getHandler(req).invoke(req, resp);
-    }
-
-    @Override
-    protected void doDelete(final HttpServletRequest req, final HttpServletResponse resp) {
-        configuration.getHandler(req).invoke(req, resp);
-    }
-
-    private void doEcho(final HttpServletRequest req, final HttpServletResponse resp) {
-        configuration.getHandler(req).echo(req, resp);
-    }
-
-    @Override
-    protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        if("ECHO".equals(req.getMethod())) {
-            doEcho(req, resp);
-        } else {
-            super.service(req, resp);
+    protected void service(final HttpServletRequest request, final HttpServletResponse response) {
+        try {
+            final String result = MethodDelegate.delegate(configuration, request, response);
+            writeResult(response, result, HttpServletResponse.SC_OK);
+        } catch (final Throwable t) {
+            final String result = RestResponseAdaptor.Service.THROWABLE.apply(t);
+            writeResult(response, result, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    void writeResult(final HttpServletResponse resp, final String result, final int status)  {
+        resp.setStatus(status);
+        resp.setHeader("Content-Type", "application/json");
+        writeResult(resp, result);
     }
 
     @Override

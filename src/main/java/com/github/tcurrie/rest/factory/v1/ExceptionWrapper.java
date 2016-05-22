@@ -2,10 +2,7 @@ package com.github.tcurrie.rest.factory.v1;
 
 import com.github.tcurrie.rest.factory.Strings;
 
-import java.io.Serializable;
-
-public class ExceptionWrapper implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class ExceptionWrapper {
     private Class<?> exceptionType;
     private String message;
     private String stackTrace;

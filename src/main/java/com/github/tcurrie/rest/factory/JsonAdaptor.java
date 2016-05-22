@@ -15,10 +15,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public interface JsonAdaptor extends Function<String, Object[]> {
+interface JsonAdaptor extends Function<String, Object[]> {
     class Factory {
         private Factory() {
-            throw RestFactoryException.create("Can not construct instance of Factory class.");
+            throw new RestFactoryException("Can not construct instance of Factory class.");
         }
 
         private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
@@ -47,7 +47,7 @@ public interface JsonAdaptor extends Function<String, Object[]> {
                     return args;
                 } catch (final Exception e) {
                     LOGGER.warn("Failed to read arguments, got [{}].", Arrays.toString(args), e);
-                    throw RestFactoryException.create(Strings.format("Failed to read arguments, got [{}].", Arrays.toString(args)), e);
+                    throw new RestFactoryException(Strings.format("Failed to read arguments, got [{}].", Arrays.toString(args)), e);
                 }
             };
         }
@@ -62,7 +62,7 @@ public interface JsonAdaptor extends Function<String, Object[]> {
                             p.getDeclaredConstructor();
                         } catch (final NoSuchMethodException e) {
                             LOGGER.error("Can not wire adaptor for parameter [{}] type has no default constructor.", p, e);
-                            throw RestFactoryException.create(Strings.format("Can not wire adaptor for parameter [{}] type has no default constructor.", p), e);
+                            throw new RestFactoryException(Strings.format("Can not wire adaptor for parameter [{}] type has no default constructor.", p), e);
                         }
                     });
         }

@@ -1,6 +1,5 @@
 package com.github.tcurrie.rest.factory.it;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import com.github.tcurrie.rest.factory.Strings;
@@ -16,13 +15,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.tcurrie.rest.factory.client.HTTPExchange.Method.ECHO;
 import static com.github.tcurrie.rest.factory.client.HTTPExchange.Method.POST;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertThat;
@@ -40,7 +37,7 @@ public class ExceptionIT {
 
     @Test
     public void testThrowsException() {
-        final Exception expected = new Exception(RandomFactory.getRandomValue(String.class));
+        final Exception expected = new IllegalStateException(RandomFactory.getRandomValue(String.class));
         TestService.DATA.put("exception", expected);
 
         try {
@@ -63,6 +60,7 @@ public class ExceptionIT {
             final int result = client.throwsRuntimeException();
             fail("Should have thrown exception, got[" + result  +"]");
         } catch (final RuntimeException actual) {
+            actual.printStackTrace();
             assertThat(actual, CoreMatchers.instanceOf(expected.getClass()));
             assertThat(actual.getMessage(), is(expected.getMessage()));
             assertThat(actual.getCause().getMessage(), containsString(Strings.getStackTrace(expected)));
@@ -82,7 +80,7 @@ public class ExceptionIT {
             throw new RuntimeException();
         } catch (NoSuchMethodException e) {
             //noinspection ThrowableResultOfMethodCallIgnored
-            expected = RestFactoryException.create(Strings.format("Failed to adapt exception [{}] from response.", Strings.getStackTrace(unbuildable)), e);
+            expected = new RestFactoryException(Strings.format("Failed to adapt exception [{}] from response.", Strings.getStackTrace(unbuildable)), e);
         }
 
         try {
@@ -96,20 +94,21 @@ public class ExceptionIT {
     }
 
     @Test
-    public void testThrowsExceptionForUnknownMethod() throws JsonProcessingException {
+    public void testThrowsExceptionForUnknownMethod() throws Throwable {
+        final Method method = TestApi.class.getMethod("consumer", Pojo.class);
         final Pojo expected = RandomFactory.getRandomValue(Pojo.class);
         TestService.DATA.put("consumed", RandomFactory.getRandomValue(Pojo.class));
 
         final String methodUrl = RestServers.SERVER.getUrl() + "/spring-generated-rest/test-api/v1/unknown";
         final String parameters = MAPPER.writeValueAsString(expected);
 
+        final String result = HTTPExchange.execute(methodUrl, parameters, POST, 30, TimeUnit.SECONDS);
+
         try {
-            final String result = HTTPExchange.execute(methodUrl, parameters, POST, 30, TimeUnit.SECONDS);
+            RestResponseAdaptor.Client.Factory.create(method).apply(result);
             fail("Should have thrown exception, got[" + result  +"]");
         } catch (final RestFactoryException e) {
-            assertThat(e.getMessage(), startsWith("Failed to complete task."));
-            assertThat(e.getCause(), instanceOf(ExecutionException.class));
-            assertThat(e.getCause().getCause().getMessage(), startsWith("Failed to execute HTTPExchange, url[http://localhost:9090/spring/spring-generated-rest/test-api/v1/unknown], body["));
+            assertThat(e.getMessage(), startsWith("Failed to match request [/spring/spring-generated-rest/test-api/v1/unknown] to any Handler from [["));
         }
     }
 
@@ -127,8 +126,7 @@ public class ExceptionIT {
             RestResponseAdaptor.Client.Factory.create(method).apply(result);
             fail("Should have thrown exception, got[" + result  +"]");
         } catch (final RestFactoryException e) {
-            assertThat(e.getMessage(), startsWith("Failed to adapt exception [com.github.tcurrie.rest.factory.v1.RestFactoryException: Failed to read arguments, got [[null]]."));
+            assertThat(e.getMessage(), is("Failed to read arguments, got [[null]]."));
         }
     }
-
 }

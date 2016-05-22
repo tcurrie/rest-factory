@@ -17,7 +17,7 @@ public interface RestResponseAdaptor {
 
         final class Factory {
             private Factory() {
-                throw RestFactoryException.create("Can not construct instance of Factory class.");
+                throw new RestFactoryException("Can not construct instance of Factory class.");
             }
 
             private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Factory.class);
@@ -42,7 +42,7 @@ public interface RestResponseAdaptor {
                         wrapper = MAPPER.readValue(result, type);
                     } catch (final IOException e) {
                         LOGGER.warn("Failed to adapt result [{}] from response.", result, e);
-                        throw RestFactoryException.create(Strings.format("Failed to adapt result [{}] from response.", result), e);
+                        throw new RestFactoryException(Strings.format("Failed to adapt result [{}] from response.", result), e);
                     }
                     if (wrapper.isSuccess()) {
                         return wrapper.getResult();
@@ -60,7 +60,7 @@ public interface RestResponseAdaptor {
 
         final class Factory {
             private Factory() {
-                throw RestFactoryException.create("Can not construct instance of Factory class.");
+                throw new RestFactoryException("Can not construct instance of Factory class.");
             }
 
             private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Factory.class);
@@ -77,7 +77,7 @@ public interface RestResponseAdaptor {
                         return MAPPER.writeValueAsString(f.apply(result));
                     } catch (final Exception e) {
                         LOGGER.warn("Failed to adapt result [{}] to response.", result, e);
-                        throw RestFactoryException.create(Strings.format("Failed to adapt result [{}] to response.", result), e);
+                        throw new RestFactoryException(Strings.format("Failed to adapt result [{}] to response.", result), e);
                     }
                 };
             }

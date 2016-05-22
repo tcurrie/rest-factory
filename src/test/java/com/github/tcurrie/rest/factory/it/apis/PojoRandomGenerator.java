@@ -24,6 +24,7 @@ public final class PojoRandomGenerator implements RandomGenerator {
         return new Pojo(getRandomValue(String.class), getRandomValue(int[].class));
     }
 
-    public static void create() {
+    @SuppressWarnings("EmptyMethod")
+    public static synchronized void create() {
     }
 }

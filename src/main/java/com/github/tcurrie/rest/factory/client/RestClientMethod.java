@@ -34,14 +34,17 @@ class RestClientMethod<T> implements ProxyMethod<T> {
         return method;
     }
 
+    @SuppressWarnings("unused")
     RestUri getMethodUrlSupplier() {
         return methodUrlSupplier;
     }
 
+    @SuppressWarnings("unused")
     RestParameterAdaptor.Client getParameterAdaptor() {
         return parameterAdaptor;
     }
 
+    @SuppressWarnings("unused")
     public RestResponseAdaptor.Client<T> getResultAdaptor() {
         return resultAdaptor;
     }
@@ -62,6 +65,7 @@ class RestClientMethod<T> implements ProxyMethod<T> {
         return BusinessIdentity.getHashCode(this);
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(final Object obj) {
         return BusinessIdentity.areEqual(this, obj);

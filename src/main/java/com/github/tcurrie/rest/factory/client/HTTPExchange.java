@@ -5,8 +5,10 @@ import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import com.openpojo.reflection.PojoField;
 import com.openpojo.reflection.impl.PojoClassFactory;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -19,7 +21,7 @@ public final class HTTPExchange {
     private static final PojoField CONNECTION_METHOD = PojoClassFactory.getPojoClass(HttpURLConnection.class).getPojoFields().stream().filter(f -> f.getName().equals("method")).findFirst().get();
 
     private HTTPExchange() {
-        throw RestFactoryException.create("Can not construct instance of Factory class.");
+        throw new RestFactoryException("Can not construct instance of Factory class.");
     }
 
     public enum Method {
@@ -52,18 +54,19 @@ public final class HTTPExchange {
             }
 
             /**
-             *  In order to override the HttpURLConnection method type constraints,
-             *  the field value must be set directly and it must be done after
-             *  the connection output stream is used.
+             *  In order to override the HttpURLConnection method type constraints, the field value must be set directly
+             *  and it must be done after the connection output stream is used.
              *  TODO Add test for this behavior
              */
             CONNECTION_METHOD.set(connection, method.name());
 
-            try (final BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+            final InputStream is = connection.getResponseCode() == HttpServletResponse.SC_OK ? connection.getInputStream() : connection.getErrorStream();
+
+            try (final BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
                 return in.lines().collect(Collectors.joining("\n"));
             }
         } catch (final Exception e) {
-            throw RestFactoryException.create(Strings.format("Failed to execute HTTPExchange, url[{}], body[{}], method[{}], timeout[{}].", url, body, method, timeout), e);
+            throw new RestFactoryException(Strings.format("Failed to execute HTTPExchange, url[{}], body[{}], method[{}], timeout[{}].", url, body, method, timeout), e);
         } finally {
             if (connection != null) {
                 connection.disconnect();

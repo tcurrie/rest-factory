@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class EmbeddedServer {
+class EmbeddedServer {
     private final Tomcat tomcat;
 
     public static EmbeddedServer create(final int port) {
@@ -23,7 +23,7 @@ public class EmbeddedServer {
     }
 
 
-    public void deploy(final String war, final String contextPath) {
+    void deploy(final String war, final String contextPath) {
         try {
             tomcat.addWebapp(contextPath, (new File(war)).getAbsolutePath());
         } catch (final ServletException e) {
@@ -31,23 +31,21 @@ public class EmbeddedServer {
         }
     }
 
-    public EmbeddedServer start() {
+    void start() {
         try {
             tomcat.start();
         } catch (final LifecycleException e) {
             throw new RuntimeException(e);
         }
 
-        return this;
     }
 
-    public EmbeddedServer stop() {
+    void stop() {
         try {
             tomcat.stop();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
-        return this;
     }
 
     private Path createTempDir() {

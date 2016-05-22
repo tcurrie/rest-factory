@@ -13,7 +13,7 @@ public interface RestParameterAdaptor {
     interface Client extends Function<Object[], String> {
         final class Factory {
             private Factory() {
-                throw RestFactoryException.create("Can not construct instance of Factory class.");
+                throw new RestFactoryException("Can not construct instance of Factory class.");
             }
 
             private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
@@ -22,11 +22,11 @@ public interface RestParameterAdaptor {
                 return p -> {
                     try {
                         final String s = MAPPER.writeValueAsString(p);
-                        LOGGER.info("Mapped [{}] to [{}].", p, s);
+                        LOGGER.debug("Mapped [{}] to [{}].", p, s);
                         return s;
                     } catch (final JsonProcessingException e) {
                         LOGGER.warn("Failed to map [{}] for method [{}].", p, method, e);
-                        throw RestFactoryException.create(Strings.format("Failed to map [{}] for method [{}].", p, method), e);
+                        throw new RestFactoryException(Strings.format("Failed to map [{}] for method [{}].", p, method), e);
                     }
                 };
             }
@@ -37,7 +37,7 @@ public interface RestParameterAdaptor {
     interface Service extends Function<String, Object[]> {
         final class Factory {
             private Factory() {
-                throw RestFactoryException.create("Can not construct instance of Factory class.");
+                throw new RestFactoryException("Can not construct instance of Factory class.");
             }
 
             private static final Logger LOGGER = LoggerFactory.getLogger(Factory.class);
@@ -48,7 +48,10 @@ public interface RestParameterAdaptor {
                     return NO_ARGUMENT_ADAPTOR;
                 } else {
                     final JsonAdaptor parser = JsonAdaptor.Factory.create(method);
-                    return r -> parser.apply(r);
+                    return r -> {
+                        LOGGER.debug("Parsing [{}] for method [{}]");
+                        return parser.apply(r);
+                    };
                 }
             }
         }

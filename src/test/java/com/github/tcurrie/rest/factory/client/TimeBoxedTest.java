@@ -28,10 +28,8 @@ public class TimeBoxedTest {
                 throw expected;
             }, 1, TimeUnit.MINUTES);
             fail();
-        } catch (final RestFactoryException e) {
-            assertThat(e.getMessage(), is("Failed to complete task."));
-            assertThat(e.getCause().getMessage(), is(expected.toString()));
-            assertThat(e.getCause().getCause(), is(expected));
+        } catch (final RuntimeException e) {
+            assertThat(e, is(expected));
         }
     }
 

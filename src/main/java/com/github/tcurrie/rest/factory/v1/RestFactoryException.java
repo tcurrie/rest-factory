@@ -1,20 +1,12 @@
 package com.github.tcurrie.rest.factory.v1;
 
 public final class RestFactoryException extends RuntimeException {
-    public static RestFactoryException create(final String message) {
-        return new RestFactoryException(message);
-    }
-    public static RestFactoryException create(final String message, final Throwable cause) {
-        return new RestFactoryException(message, cause);
-    }
-
-    private RestFactoryException(final String message) {
+    public RestFactoryException(final String message) {
         super(message);
     }
 
-    private RestFactoryException(final String message, final Throwable cause) {
+    public RestFactoryException(final String message, final Throwable cause) {
         super(message, cause);
     }
-
 
 }

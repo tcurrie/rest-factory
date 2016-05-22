@@ -6,7 +6,7 @@ import java.lang.reflect.Proxy;
 
 public final class ProxyFactory {
     private ProxyFactory() {
-        throw RestFactoryException.create("Can not construct instance of Factory class.");
+        throw new RestFactoryException("Can not construct instance of Factory class.");
     }
 
     @SuppressWarnings("unchecked")
