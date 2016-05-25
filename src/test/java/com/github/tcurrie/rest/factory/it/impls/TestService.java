@@ -3,6 +3,7 @@ package com.github.tcurrie.rest.factory.it.impls;
 import com.github.tcurrie.rest.factory.it.apis.Pojo;
 import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.github.tcurrie.rest.factory.service.RestService;
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.ArrayUtils;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RestService
@@ -92,5 +94,20 @@ public class TestService implements TestApi {
     @Override
     public int throwsRuntimeException() {
         throw (RuntimeException) DATA.get("runtimeException");
+    }
+
+    @Override
+    public String join(final String[] values) {
+        final String result = Arrays.stream(values).collect(Collectors.joining());
+        LOGGER.debug("Join [{}] to [{}] ", Arrays.toString(values), result);
+        return result;
+    }
+
+//    @Override
+    public String join(final String[] values, final String separator) {
+        if (separator == null) throw new RestFactoryException("No separator.");
+        final String result = Arrays.stream(values).collect(Collectors.joining(separator));
+        LOGGER.debug("Join [{}] with [{}] to [{}] ", Arrays.toString(values), separator, result);
+        return result;
     }
 }

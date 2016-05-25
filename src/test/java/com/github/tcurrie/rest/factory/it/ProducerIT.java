@@ -61,8 +61,9 @@ public class ProducerIT {
                 .flatMap(c->Methods.BeanFactory.map(c, t->m->m))
                 .filter(m->!ProxyMethodHandler.class.equals(m.getDeclaringClass()))
                 .collect(Collectors.toMap(
-                        m->RestUriFactory.getInstance().create(URL_SUPPLIER, m.getDeclaringClass(), m).get(),
-                        Method::toGenericString));
+                        Method::toGenericString,
+                        m->RestUriFactory.getInstance().create(URL_SUPPLIER, m.getDeclaringClass(), m).get()
+                        ));
 
         final RestClientMonitor monitor = RestClientFactory.create(RestClientMonitor.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");
         final Set<RestMethodVerificationResult> actual = monitor.verifyClients();
@@ -70,15 +71,15 @@ public class ProducerIT {
             if (t.getUrl().startsWith("http")) {
                 assertThat(t.isSuccess(), is(true));
                 assertThat(t.getArgs(), is(t.getResult()));
-                assertThat(expected.keySet(), CoreMatchers.hasItem(t.getUrl()));
-                assertThat(t.getApi(), is(expected.get(t.getUrl())));
-                expected.remove(t.getUrl());
+                if (expected.containsKey(t.getApi())) {
+                    assertThat(t.getUrl(), is(expected.get(t.getApi())));
+                    expected.remove(t.getApi());
+                }
             } else {
                 assertThat(t.isSuccess(), is(false));
                 assertThat(t.getException(), CoreMatchers.notNullValue());
             }
         });
-        assertThat(actual.size(), is(23));
         assertThat("Should have found [" + expected + "]", expected.size(), is(0));
     }
 
@@ -87,7 +88,8 @@ public class ProducerIT {
         final JavaType type = new ObjectMapper().getTypeFactory().constructParametrizedType(Set.class, HashSet.class,
                 RestMethod.class);
         final String expectedJson =
-        "[{\"uri\":\"/test-api/v1/add\",\"method\":\"add\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/rest-client-monitor/v1/verify-clients\",\"method\":\"verifyClients\",\"bean\":\"com.github.tcurrie.rest.factory.v1.RestClientMonitor\"},{\"uri\":\"/rest-method-dictionary/v1/get-methods\",\"method\":\"getMethods\",\"bean\":\"com.github.tcurrie.rest.factory.v1.RestMethodDictionary\"},{\"uri\":\"/test-api/v1/throws-exception\",\"method\":\"throwsException\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/producer\",\"method\":\"producer\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/consumer\",\"method\":\"consumer\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/runnable\",\"method\":\"runnable\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/throws-runtime-exception\",\"method\":\"throwsRuntimeException\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/reverse\",\"method\":\"reverse\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/min\",\"method\":\"min\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/dedup\",\"method\":\"dedup\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/concatenate\",\"method\":\"concatenate\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/sum\",\"method\":\"sum\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"}]";
+        "[{\"uri\":\"/test-api/v1/add\",\"method\":\"add\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/rest-client-monitor/v1/verify-clients\",\"method\":\"verifyClients\",\"bean\":\"com.github.tcurrie.rest.factory.v1.RestClientMonitor\"},{\"uri\":\"/rest-method-dictionary/v1/get-methods\",\"method\":\"getMethods\",\"bean\":\"com.github.tcurrie.rest.factory.v1.RestMethodDictionary\"},{\"uri\":\"/test-api/v1/throws-exception\",\"method\":\"throwsException\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/producer\",\"method\":\"producer\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/runnable\",\"method\":\"runnable\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/consumer\",\"method\":\"consumer\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/throws-runtime-exception\",\"method\":\"throwsRuntimeException\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/reverse\",\"method\":\"reverse\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/min\",\"method\":\"min\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/join\",\"method\":\"join\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/dedup\",\"method\":\"dedup\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/concatenate\",\"method\":\"concatenate\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/sum\",\"method\":\"sum\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"}]";
+        //"[{\"uri\":\"/test-api/v1/add\",\"method\":\"add\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/rest-client-monitor/v1/verify-clients\",\"method\":\"verifyClients\",\"bean\":\"com.github.tcurrie.rest.factory.v1.RestClientMonitor\"},{\"uri\":\"/rest-method-dictionary/v1/get-methods\",\"method\":\"getMethods\",\"bean\":\"com.github.tcurrie.rest.factory.v1.RestMethodDictionary\"},{\"uri\":\"/test-api/v1/throws-exception\",\"method\":\"throwsException\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/producer\",\"method\":\"producer\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/consumer\",\"method\":\"consumer\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/runnable\",\"method\":\"runnable\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/throws-runtime-exception\",\"method\":\"throwsRuntimeException\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/reverse\",\"method\":\"reverse\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/min\",\"method\":\"min\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/dedup\",\"method\":\"dedup\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/concatenate\",\"method\":\"concatenate\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/sum\",\"method\":\"sum\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"}]";
         final Set<RestMethod> expected = new ObjectMapper().readValue(expectedJson, type);
 
         final RestMethodDictionary dictionary = RestClientFactory.create(RestMethodDictionary.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");

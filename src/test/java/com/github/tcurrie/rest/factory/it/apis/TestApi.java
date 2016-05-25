@@ -14,4 +14,6 @@ public interface TestApi {
     int sum(int... values);
     int throwsException() throws Exception;
     int throwsRuntimeException();
+    String join(String[] values);
+//    String join(String[] values, String separator);
 }
