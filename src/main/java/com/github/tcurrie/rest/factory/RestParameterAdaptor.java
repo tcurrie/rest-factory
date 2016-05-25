@@ -33,7 +33,6 @@ public interface RestParameterAdaptor {
         }
     }
 
-
     interface Service extends Function<String, Object[]> {
         final class Factory {
             private Factory() {

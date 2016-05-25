@@ -11,6 +11,7 @@ import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.github.tcurrie.rest.factory.it.impls.TestService;
 import com.github.tcurrie.rest.factory.v1.ResponseWrapper;
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.RestMethodVerificationResult;
 import com.openpojo.random.RandomFactory;
 import com.openpojo.reflection.PojoField;
 import com.openpojo.reflection.impl.PojoClassFactory;
@@ -27,6 +28,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -52,7 +54,7 @@ public class ConsumerIT {
     @Before
     public void before() {
         PojoRandomGenerator.create();
-        this.client = RestClientFactory.create(TestApi.class, ()->RestServers.SERVER.getUrl() + "/spring-generated-rest");
+        this.client = RestClientFactory.create(TestApi.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");
     }
 
     @Test
@@ -97,7 +99,7 @@ public class ConsumerIT {
 
     @Test
     public void testConsumesPojoWithOptions() throws IOException {
-        final String methodUrl = RestServers.SERVER.getUrl() + "/spring-generated-rest/test-api/v1/consumer";
+        final String methodUrl = RestServers.SERVER.getUrl() + "/generated-rest/test-api/v1/consumer";
         final Pojo expected = RandomFactory.getRandomValue(Pojo.class);
 
         verifyConnectionResults("OPTIONS", methodUrl, expected, (connection, result) -> {
@@ -121,6 +123,15 @@ public class ConsumerIT {
         Assert.assertNull(wrapper.getException());
 
         assertThat(TestService.DATA.get("consumed"), not(expected));
+    }
+
+    @Test
+    public void testVerifiesClient() {
+        final Set<RestMethodVerificationResult> verified = RestClientFactory.verify(client);
+        verified.forEach(m -> {
+            Assert.assertThat(m.isSuccess(), is(true));
+            Assert.assertArrayEquals(m.getArgs(), m.getResult());
+        });
     }
 
     private void verifyConnectionResults(final String method, final String methodUrl, final Pojo expected, final BiConsumer<HttpURLConnection, String> v) throws IOException {
@@ -164,7 +175,7 @@ public class ConsumerIT {
 
 
     private String exchange(final HTTPExchange.Method method, final Pojo expected) throws JsonProcessingException {
-        final String methodUrl = RestServers.SERVER.getUrl() + "/spring-generated-rest/test-api/v1/consumer";
+        final String methodUrl = RestServers.SERVER.getUrl() + "/generated-rest/test-api/v1/consumer";
         final String parameters = MAPPER.writeValueAsString(expected);
         return HTTPExchange.execute(methodUrl, parameters, method, 30, TimeUnit.SECONDS);
     }

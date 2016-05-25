@@ -1,7 +1,7 @@
 package com.github.tcurrie.rest.factory.it;
 
-public enum RestServers {
-    SERVER("/spring");
+enum RestServers {
+    SERVER("");
     private final String contextPath;
 
     RestServers(final String contextPath) {

@@ -3,7 +3,7 @@ package com.github.tcurrie.rest.factory.service;
 import com.github.tcurrie.rest.factory.Strings;
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import com.github.tcurrie.rest.factory.v1.RestMethodDictionary;
-import com.github.tcurrie.rest.factory.v1.RestMethodDictionary.MethodDescription;
+import com.github.tcurrie.rest.factory.v1.RestMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +17,11 @@ import java.util.stream.Stream;
 final class UriSetRestHandlerDictionary implements RequestDelegate {
     // TODO Replace with node search for speed
     private static final Logger LOGGER = LoggerFactory.getLogger(UriSetRestHandlerDictionary.class);
-    private static final Function<RestMethod, MethodDescription> METHOD_TO_DESCRIPTION = h -> MethodDescription.create(h.getUri(),
+    private static final Function<RestServiceMethod, RestMethod> METHOD_TO_DESCRIPTION = h -> RestMethod.create(h.getUri(),
             h.getImplementation().getMethodName(), h.getImplementation().getBeanName());
-    private final Set<RestMethod> handlers;
+    private final Set<RestServiceMethod> handlers;
 
-    static UriSetRestHandlerDictionary create(final Stream<RestMethod> handlers) {
+    static UriSetRestHandlerDictionary create(final Stream<RestServiceMethod> handlers) {
 
         final UriSetRestHandlerDictionary d = new UriSetRestHandlerDictionary();
         d.handlers.addAll(handlers.collect(Collectors.toSet()));
@@ -36,9 +36,9 @@ final class UriSetRestHandlerDictionary implements RequestDelegate {
     }
 
     @Override
-    public RestMethod getHandler(final HttpServletRequest req) {
+    public RestServiceMethod getHandler(final HttpServletRequest req) {
         final String uri = req.getRequestURI();
-        final RestMethod<?,?> handler = find(uri);
+        final RestServiceMethod<?,?> handler = find(uri);
         if (handler == null) {
             LOGGER.warn("Failed to match request [{}] to any Handler from [{}]", req.getRequestURI(), handlers);
             throw new RestFactoryException(Strings.format("Failed to match request [{}] to any Handler from [{}]", req.getRequestURI(), handlers));
@@ -46,8 +46,8 @@ final class UriSetRestHandlerDictionary implements RequestDelegate {
         return handler;
     }
 
-    private RestMethod<?,?> find(final String uri) {
-        for (final RestMethod h : handlers) {
+    private RestServiceMethod<?,?> find(final String uri) {
+        for (final RestServiceMethod h : handlers) {
             if (uri.contains(h.getUri())) {
                 return h;
             }

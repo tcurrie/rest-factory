@@ -37,7 +37,7 @@ public interface RestResponseAdaptor {
 
                 return result -> {
                     final ResponseWrapper<T> wrapper;
-                    LOGGER.info("Adapting result from wrapper [{}]", result);
+                    LOGGER.debug("Adapting result from wrapper [{}]", result);
                     try {
                         wrapper = MAPPER.readValue(result, type);
                     } catch (final IOException e) {

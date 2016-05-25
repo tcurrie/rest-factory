@@ -20,13 +20,13 @@
 
     <!-- Generated Rest servlet -->
     <servlet>
-        <servlet-name>spring-generated-rest</servlet-name>
+        <servlet-name>generated-rest</servlet-name>
         <servlet-class>com.github.tcurrie.rest.factory.service.GeneratedRestService</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <servlet-name>spring-generated-rest</servlet-name>
-        <url-pattern>/spring-generated-rest/*</url-pattern>
+        <servlet-name>generated-rest</servlet-name>
+        <url-pattern>/generated-rest/*</url-pattern>
     </servlet-mapping>
 
     <session-config>

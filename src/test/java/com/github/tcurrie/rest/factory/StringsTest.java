@@ -26,7 +26,7 @@ public class StringsTest {
     @Test
     public void testStringFormatWithNullArgs() {
         final String expected = RandomFactory.getRandomValue(String.class);
-        assertThat(Strings.format(expected, null), is(expected));
+        assertThat(Strings.format(expected, (Object[]) null), is(expected));
     }
 
     @Test
@@ -37,13 +37,11 @@ public class StringsTest {
 
     @Test
     public void testStringFormatWithNullMessageAndNoArgs() {
-        final String expected = RandomFactory.getRandomValue(String.class);
         assertThat(Strings.format(null), is("[]"));
     }
     @Test
     public void testStringFormatWithNullMessageAndNullArgs() {
-        final String expected = RandomFactory.getRandomValue(String.class);
-        assertThat(Strings.format(null, null), is("null"));
+        assertThat(Strings.format(null, (Object[]) null), is("null"));
     }
 
     @Test
@@ -68,7 +66,6 @@ public class StringsTest {
         }
         final UnStringable unStringable = new UnStringable();
         assertThat(Strings.format("{}", unStringable), is("[FAILED toString()]"));
-
     }
 
     @Test

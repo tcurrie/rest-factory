@@ -29,7 +29,7 @@ interface JsonAdaptor extends Function<String, Object[]> {
 
         public static JsonAdaptor create(final Method method) {
             final Class<?>[] parameterTypes = method.getParameterTypes();
-            LOGGER.info("Creating Json adaptor from Reader to [{}]", Arrays.toString(parameterTypes));
+            LOGGER.debug("Creating Json adaptor from Reader to [{}]", Arrays.toString(parameterTypes));
             validateParameters(parameterTypes);
             final List<JavaType> javaTypes =
                     Arrays.stream(method.getGenericParameterTypes()).map(t->

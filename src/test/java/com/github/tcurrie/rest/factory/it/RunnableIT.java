@@ -18,7 +18,7 @@ public class RunnableIT {
     @Before
     public void before() {
         PojoRandomGenerator.create();
-        this.client = RestClientFactory.create(TestApi.class, ()->RestServers.SERVER.getUrl() + "/spring-generated-rest");
+        this.client = RestClientFactory.create(TestApi.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");
     }
 
     @Test

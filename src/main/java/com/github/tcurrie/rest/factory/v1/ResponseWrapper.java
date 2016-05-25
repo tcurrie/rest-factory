@@ -14,9 +14,10 @@ public class ResponseWrapper<T> {
         return new ResponseWrapper<>(exception, false);
     }
 
+    @SuppressWarnings("unused")
     private ResponseWrapper() {}
 
-    public ResponseWrapper(final ExceptionWrapper exception, final boolean success) {
+    private ResponseWrapper(final ExceptionWrapper exception, final boolean success) {
         this.exception = exception;
         this.success = success;
     }

@@ -13,6 +13,7 @@ public class Pojo implements Serializable {
     @BusinessKey(required = false)
     private int[] data;
 
+    @SuppressWarnings("unused")
     private Pojo() {
     }
 

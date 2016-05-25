@@ -18,10 +18,12 @@ public class RestUri implements Supplier<String> {
         this.methodUri = methodUri;
     }
 
+    @SuppressWarnings("unused")
     public Supplier<String> getUrlSupplier() {
         return urlSupplier;
     }
 
+    @SuppressWarnings("unused")
     public String getMethodUri() {
         return methodUri;
     }
@@ -36,6 +38,7 @@ public class RestUri implements Supplier<String> {
         return BusinessIdentity.getHashCode(this);
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(final Object obj) {
         return BusinessIdentity.areEqual(this, obj);

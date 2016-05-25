@@ -17,19 +17,19 @@ final class RestMethodFactory {
         throw new RestFactoryException("Can not construct instance of Factory class.");
     }
 
-    static Stream<RestMethod> create(final Collection<Object> beans) {
+    static Stream<RestServiceMethod> create(final Collection<Object> beans) {
         return beans.stream().flatMap(RestMethodFactory::create);
     }
 
-    static Stream<RestMethod> create(final Object bean) {
+    static Stream<RestServiceMethod> create(final Object bean) {
         return Methods.BeanFactory.map(bean, type -> (method -> create(bean, type, method)));
     }
 
     @SuppressWarnings("unchecked")
-    private static <T, U> RestMethod<T, U> create(final Object bean, final Class<T> type, final Method method) {
+    private static <T, U> RestServiceMethod<T, U> create(final Object bean, final Class<T> type, final Method method) {
         final String uri = RestUriFactory.getInstance().create(type, method);
         final RestParameterAdaptor.Service requestAdaptor = RestParameterAdaptor.Service.Factory.create(method);
         final RestResponseAdaptor.Service<U> resultAdaptor = RestResponseAdaptor.Service.Factory.create();
-        return new RestMethod<>(uri, MethodImplementation.create((T) bean, method), requestAdaptor, resultAdaptor);
+        return new RestServiceMethod<>(uri, MethodImplementation.create((T) bean, method), requestAdaptor, resultAdaptor);
     }
 }

@@ -25,20 +25,20 @@ public class TestService implements TestApi {
 
     @Override
     public void runnable() {
-        LOGGER.info("RAN " + System.currentTimeMillis());
+        LOGGER.debug("RAN " + System.currentTimeMillis());
         DATA.compute("runs", (k,v)->v==null?1:((Integer)v)+1);
     }
 
     @Override
     public void consumer(final Pojo c) {
-        LOGGER.info("CONSUMED [" + c + "] " + System.currentTimeMillis());
+        LOGGER.debug("CONSUMED [" + c + "] " + System.currentTimeMillis());
         DATA.put("consumed", c);
     }
 
     @Override
     public Pojo producer() {
         final Pojo product = (Pojo) DATA.get("produce");
-        LOGGER.info("PRODUCED [" + product + "] " + System.currentTimeMillis());
+        LOGGER.debug("PRODUCED [" + product + "] " + System.currentTimeMillis());
         return product;
     }
 
@@ -47,14 +47,14 @@ public class TestService implements TestApi {
         int[] copy = ArrayUtils.clone(c.getData());
         ArrayUtils.reverse(copy);
         final Pojo product = new Pojo(StringUtils.reverse(c.getValue()), copy);
-        LOGGER.info("ADAPTED [" + c + "] to [" + product + "] " + System.currentTimeMillis());
+        LOGGER.debug("ADAPTED [" + c + "] to [" + product + "] " + System.currentTimeMillis());
         return product;
     }
 
     @Override
     public Pojo concatenate(final Pojo a, final Pojo b) {
         final Pojo product = new Pojo(a.getValue() + " " + b.getValue(), ArrayUtils.addAll(a.getData(), b.getData()));
-        LOGGER.info("Concatenate [" + a + "] and [" + b + "] to [" + product + "] " + System.currentTimeMillis());
+        LOGGER.debug("Concatenate [" + a + "] and [" + b + "] to [" + product + "] " + System.currentTimeMillis());
         return product;
     }
 
@@ -73,14 +73,14 @@ public class TestService implements TestApi {
     @Override
     public int add(final int a, final int b) {
         final int sum = a + b;
-        LOGGER.info("Add [" + a + "] and [" + b + "] to [" + sum + "] " + System.currentTimeMillis());
+        LOGGER.debug("Add [" + a + "] and [" + b + "] to [" + sum + "] " + System.currentTimeMillis());
         return sum;
     }
 
     @Override
     public int sum(final int... values) {
         final int sum = IntStream.of(values).sum();
-        LOGGER.info("Sum [" + Arrays.toString(values) + "] to [" + sum + "] " + System.currentTimeMillis());
+        LOGGER.debug("Sum [" + Arrays.toString(values) + "] to [" + sum + "] " + System.currentTimeMillis());
         return sum;
     }
 

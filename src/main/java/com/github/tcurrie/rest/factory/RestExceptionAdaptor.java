@@ -22,7 +22,6 @@ interface RestExceptionAdaptor {
                             wrapper.getExceptionType().getConstructor(String.class).newInstance(wrapper.getStackTrace())
                     );
                 } catch (final Exception e) {
-                    e.printStackTrace();
                     LOGGER.warn("Failed to adapt exception [{}] from response.", wrapper.getStackTrace(), e);
                     throw new RestFactoryException(Strings.format("Failed to adapt exception [{}] from response.", wrapper.getStackTrace()), e);
                 }
