@@ -9,7 +9,6 @@ import com.github.tcurrie.rest.factory.it.apis.PojoRandomGenerator;
 import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.github.tcurrie.rest.factory.it.impls.TestService;
 import com.github.tcurrie.rest.factory.proxy.Methods;
-import com.github.tcurrie.rest.factory.proxy.ProxyMethodHandler;
 import com.github.tcurrie.rest.factory.v1.RestClientMonitor;
 import com.github.tcurrie.rest.factory.v1.RestMethod;
 import com.github.tcurrie.rest.factory.v1.RestMethodDictionary;
@@ -25,12 +24,13 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -55,30 +55,33 @@ public class ProducerIT {
 
     @Test
     public void testProducesVerificationResults() {
-        final Map<String, String> expected = Stream.of(
-                RestClientFactory.create(TestApi.class, URL_SUPPLIER),
-                RestClientFactory.create(RestClientMonitor.class, URL_SUPPLIER))
-                .flatMap(c->Methods.BeanFactory.map(c, t->m->m))
-                .filter(m->!ProxyMethodHandler.class.equals(m.getDeclaringClass()))
-                .collect(Collectors.toMap(
-                        Method::toGenericString,
-                        m->RestUriFactory.getInstance().create(URL_SUPPLIER, m.getDeclaringClass(), m).get()
-                        ));
+        RestClientFactory.create(TestApi.class, URL_SUPPLIER);
+        RestClientFactory.create(TestApi.class, ()->"invalid");
+        RestClientFactory.create(RestClientMonitor.class, URL_SUPPLIER);
+
+        Function<Supplier<String>, Function<Method, String>> toSig =
+                s -> m -> RestUriFactory.getInstance().create(s, m.getDeclaringClass(), m).get()
+                + "\n" + m.toGenericString();
+
+        final Set<String> expected = Stream.concat(
+            Methods.TypeFactory.map(RestClientMonitor.class, m -> toSig.apply(URL_SUPPLIER).apply(m)),
+            Stream.of(URL_SUPPLIER, () -> "invalid").flatMap(s->
+                    Methods.TypeFactory.map(TestApi.class, m -> toSig.apply(s).apply(m)))
+        ).collect(Collectors.toSet());
 
         final RestClientMonitor monitor = RestClientFactory.create(RestClientMonitor.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");
         final Set<RestMethodVerificationResult> actual = monitor.verifyClients();
         actual.stream().sorted((a, b)->a.getUrl().compareTo(b.getUrl())).forEach(t->{
+            final String signature = t.getUrl() + "\n" + t.getApi();
             if (t.getUrl().startsWith("http")) {
                 assertThat(t.isSuccess(), is(true));
                 assertThat(t.getArgs(), is(t.getResult()));
-                if (expected.containsKey(t.getApi())) {
-                    assertThat(t.getUrl(), is(expected.get(t.getApi())));
-                    expected.remove(t.getApi());
-                }
             } else {
                 assertThat(t.isSuccess(), is(false));
                 assertThat(t.getException(), CoreMatchers.notNullValue());
             }
+            assertThat(expected, hasItem(signature));
+            expected.remove(signature);
         });
         assertThat("Should have found [" + expected + "]", expected.size(), is(0));
     }
