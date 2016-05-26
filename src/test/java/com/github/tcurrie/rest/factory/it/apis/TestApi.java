@@ -15,5 +15,5 @@ public interface TestApi {
     int throwsException() throws Exception;
     int throwsRuntimeException();
     String join(String[] values);
-//    String join(String[] values, String separator);
+    String join(String[] values, String separator);
 }

@@ -32,11 +32,29 @@ class MethodDelegate {
     }
 
     private static String invoke(final RequestDelegate delegate, final HttpServletRequest request, final HttpServletResponse response) throws Throwable {
-        return delegate.getHandler(request).invoke(getBody(request));
+        final String body = getBody(request);
+        Throwable throwable = new RestFactoryException("Unable to handle request.");
+        for (final RestServiceMethod m : delegate.getHandlers(request)) {
+            try {
+                return m.invoke(body);
+            } catch (final Throwable t) {
+                throwable = t;
+            }
+        }
+        throw throwable;
     }
 
     private static String echo(final RequestDelegate delegate, final HttpServletRequest request, final HttpServletResponse response) throws Throwable {
-        return delegate.getHandler(request).echo(getBody(request));
+        final String body = getBody(request);
+        Throwable throwable = new RestFactoryException("Unable to handle request.");
+        for (final RestServiceMethod m : delegate.getHandlers(request)) {
+            try {
+                return m.echo(body);
+            } catch (final Throwable t) {
+                throwable = t;
+            }
+        }
+        throw throwable;
     }
 
     private static String options(final RequestDelegate delegate, final HttpServletRequest request, final HttpServletResponse response) throws Throwable {

@@ -14,9 +14,8 @@ import java.util.Arrays;
 final class RestServiceMethod<T, U> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RestServiceMethod.class);
 
-    @BusinessKey
-    private final String uri;
-    private final MethodImplementation<T, U> implementation;
+    @BusinessKey private final String uri;
+    @BusinessKey private final MethodImplementation<T, U> implementation;
     private final RestParameterAdaptor.Service requestAdaptor;
     private final RestResponseAdaptor.Service<U> responseAdaptor;
 

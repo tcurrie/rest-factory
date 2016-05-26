@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -103,7 +103,7 @@ public class TestService implements TestApi {
         return result;
     }
 
-//    @Override
+    @Override
     public String join(final String[] values, final String separator) {
         if (separator == null) throw new RestFactoryException("No separator.");
         final String result = Arrays.stream(values).collect(Collectors.joining(separator));

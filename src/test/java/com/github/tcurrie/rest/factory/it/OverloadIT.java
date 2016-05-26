@@ -30,9 +30,9 @@ public class OverloadIT {
         final String expectedB = Arrays.stream(input).collect(Collectors.joining(separator));
 
         final String actualA = client.join(input);
-//        final String actualB = client.join(input, separator);
+        final String actualB = client.join(input, separator);
 
         assertThat(actualA, is(expectedA));
-//        assertThat(actualB, is(expectedB));
+        assertThat(actualB, is(expectedB));
     }
 }

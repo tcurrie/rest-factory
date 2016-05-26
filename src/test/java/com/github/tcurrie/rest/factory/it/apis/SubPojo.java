@@ -2,13 +2,11 @@ package com.github.tcurrie.rest.factory.it.apis;
 
 import com.openpojo.business.BusinessIdentity;
 
-import java.io.Serializable;
-
-public class Pojo extends SuperPojo implements Serializable {
-    protected Pojo() {
+public class SubPojo extends Pojo {
+    protected SubPojo() {
         super();
     }
-    public Pojo(final String value, final int[] data) {
+    public SubPojo(final String value, final int[] data) {
         super(value, data);
     }
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
@@ -22,4 +20,5 @@ public class Pojo extends SuperPojo implements Serializable {
     public int hashCode() {
         return BusinessIdentity.getHashCode(this);
     }
+
 }

@@ -16,12 +16,18 @@ public final class PojoRandomGenerator implements RandomGenerator {
 
     @Override
     public Collection<Class<?>> getTypes() {
-        return Lists.newArrayList(Pojo.class);
+        return Lists.newArrayList(Pojo.class, SuperPojo.class, SubPojo.class);
     }
 
     @Override
     public Object doGenerate(final Class<?> type) {
-        return new Pojo(getRandomValue(String.class), getRandomValue(int[].class));
+        if (type.equals(Pojo.class)) {
+            return new Pojo(getRandomValue(String.class), getRandomValue(int[].class));
+        } else if (type.equals(SuperPojo.class)) {
+            return new SuperPojo(getRandomValue(String.class), getRandomValue(int[].class));
+        } else {
+            return new SubPojo(getRandomValue(String.class), getRandomValue(int[].class));
+        }
     }
 
     @SuppressWarnings("EmptyMethod")
