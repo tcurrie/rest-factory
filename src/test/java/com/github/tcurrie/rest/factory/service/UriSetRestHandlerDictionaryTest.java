@@ -29,9 +29,7 @@ public class UriSetRestHandlerDictionaryTest {
             when(request.getRequestURI()).thenReturn(h.getUri());
             final List<RestServiceMethod> strategies = d.getHandlers(request);
             assertThat(strategies, hasItem(h));
-            strategies.forEach(s-> {
-                assertThat(s.getUri(), is(h.getUri()));
-            });
+            strategies.forEach(s-> assertThat(s.getUri(), is(h.getUri())));
         });
     }
 

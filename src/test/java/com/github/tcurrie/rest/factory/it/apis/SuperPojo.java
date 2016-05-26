@@ -13,10 +13,10 @@ public class SuperPojo {
     private int[] data;
 
     @SuppressWarnings("unused")
-    protected SuperPojo() {
+    SuperPojo() {
     }
 
-    public SuperPojo(final String value, final int[] data) {
+    SuperPojo(final String value, final int[] data) {
         this.value = value;
         this.data = data;
     }

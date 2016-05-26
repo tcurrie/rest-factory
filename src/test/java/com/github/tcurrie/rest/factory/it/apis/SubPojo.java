@@ -2,11 +2,8 @@ package com.github.tcurrie.rest.factory.it.apis;
 
 import com.openpojo.business.BusinessIdentity;
 
-public class SubPojo extends Pojo {
-    protected SubPojo() {
-        super();
-    }
-    public SubPojo(final String value, final int[] data) {
+class SubPojo extends Pojo {
+    SubPojo(final String value, final int[] data) {
         super(value, data);
     }
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
