@@ -1,6 +1,7 @@
 package com.github.tcurrie.rest.factory.client;
 
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.TimeOut;
 import com.openpojo.random.RandomFactory;
 import org.junit.Test;
 
@@ -16,7 +17,7 @@ public class TimeBoxedTest {
 
     @Test
     public void testCompletesWork() {
-        final boolean complete = TimeBoxed.attempt(()->true, 1, TimeUnit.MINUTES);
+        final boolean complete = TimeBoxed.attempt(()->true, TimeOut.create(1, TimeUnit.MINUTES));
         assertThat(complete, is(true));
     }
 
@@ -26,7 +27,7 @@ public class TimeBoxedTest {
         try {
             TimeBoxed.attempt(()-> {
                 throw expected;
-            }, 1, TimeUnit.MINUTES);
+            }, TimeOut.create(1, TimeUnit.MINUTES));
             fail();
         } catch (final RuntimeException e) {
             assertThat(e, is(expected));
@@ -43,7 +44,7 @@ public class TimeBoxedTest {
                     throw new RuntimeException();
                 }
                 return true;
-            }, 1, TimeUnit.MILLISECONDS);
+            }, TimeOut.create(1, TimeUnit.MILLISECONDS));
             fail();
         } catch (final RestFactoryException e) {
             assertThat(e.getMessage(), is("Failed to complete task."));

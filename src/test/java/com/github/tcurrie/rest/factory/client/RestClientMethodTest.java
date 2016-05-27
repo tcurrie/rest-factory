@@ -13,8 +13,6 @@ import com.openpojo.reflection.impl.PojoClassFactory;
 import com.openpojo.validation.Validator;
 import com.openpojo.validation.ValidatorBuilder;
 import com.openpojo.validation.rule.impl.BusinessKeyMustExistRule;
-import com.openpojo.validation.rule.impl.GetterMustExistRule;
-import com.openpojo.validation.rule.impl.SetterMustExistRule;
 import com.openpojo.validation.test.impl.BusinessIdentityTester;
 import com.openpojo.validation.test.impl.GetterTester;
 import com.openpojo.validation.test.impl.SetterTester;
@@ -68,8 +66,6 @@ public class RestClientMethodTest {
     @Test
     public void testStructure() throws NoSuchMethodException {
         final Validator validator = ValidatorBuilder.create()
-                .with(new GetterMustExistRule())
-                .with(new SetterMustExistRule())
                 .with(new BusinessKeyMustExistRule())
                 .with(new GetterTester())
                 .with(new SetterTester())
@@ -82,7 +78,7 @@ public class RestClientMethodTest {
     public void testToString() {
         final String uri = RandomFactory.getRandomValue(String.class);
         final String baseUrl = RandomFactory.getRandomValue(String.class);
-        @SuppressWarnings("unchecked") final RestClientMethod restMethod = new RestClientMethod(null, RestUri.create(()->baseUrl, uri), null, null, null);
+        @SuppressWarnings("unchecked") final RestClientMethod restMethod = new RestClientMethod(null, RestUri.create(()->baseUrl, uri), null, null, null, null);
         assertThat(restMethod.toString(), CoreMatchers.is(BusinessIdentity.toString(restMethod)));
     }
 

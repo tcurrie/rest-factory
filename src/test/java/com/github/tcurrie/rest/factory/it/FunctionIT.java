@@ -1,9 +1,7 @@
 package com.github.tcurrie.rest.factory.it;
 
-import com.github.tcurrie.rest.factory.client.RestClientFactory;
 import com.github.tcurrie.rest.factory.it.apis.Pojo;
 import com.github.tcurrie.rest.factory.it.apis.PojoRandomGenerator;
-import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.google.common.collect.Sets;
 import com.openpojo.random.RandomFactory;
 import org.apache.commons.lang.ArrayUtils;
@@ -17,13 +15,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class FunctionIT {
-
-    private TestApi client;
-
     @Before
     public void before() {
         PojoRandomGenerator.create();
-        this.client = RestClientFactory.create(TestApi.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");
     }
 
     @Test
@@ -33,7 +27,7 @@ public class FunctionIT {
         ArrayUtils.reverse(copy);
         final Pojo expected = new Pojo(StringUtils.reverse(input.getValue()), copy);
 
-        final Pojo actual = client.reverse(input);
+        final Pojo actual = TestClients.getValidTestApi().reverse(input);
 
         assertThat(actual, is(expected));
     }
@@ -45,7 +39,7 @@ public class FunctionIT {
 
         final Pojo expected = new Pojo(a.getValue() + " " + b.getValue(), ArrayUtils.addAll(a.getData(), b.getData()));
 
-        final Pojo actual = client.concatenate(a, b);
+        final Pojo actual = TestClients.getValidTestApi().concatenate(a, b);
 
         assertThat(actual, is(expected));
     }
@@ -57,7 +51,7 @@ public class FunctionIT {
 
         final int expected = a + b;
 
-        final int actual = client.add(a, b);
+        final int actual = TestClients.getValidTestApi().add(a, b);
 
         assertThat(actual, is(expected));
     }
@@ -70,7 +64,7 @@ public class FunctionIT {
 
         final int expected = a + b + c;
 
-        final int actual = client.sum(a, b, c);
+        final int actual = TestClients.getValidTestApi().sum(a, b, c);
 
         assertThat(actual, is(expected));
     }
@@ -81,7 +75,7 @@ public class FunctionIT {
         final Pojo b = RandomFactory.getRandomValue(Pojo.class);
         final Set<Pojo> expected = Sets.newHashSet(a, b);
 
-        final Set<Pojo> actual = client.dedup(a, b, a, b);
+        final Set<Pojo> actual = TestClients.getValidTestApi().dedup(a, b, a, b);
 
         assertThat(actual, is(expected));
     }
@@ -92,7 +86,7 @@ public class FunctionIT {
         final Pojo b = RandomFactory.getRandomValue(Pojo.class);
         final Pojo expected = a.getValue().compareTo(b.getValue()) < 0 ? a : b;
 
-        final Pojo actual = client.min(Sets.newHashSet(a, b));
+        final Pojo actual = TestClients.getValidTestApi().min(Sets.newHashSet(a, b));
 
         assertThat(actual, is(expected));
     }

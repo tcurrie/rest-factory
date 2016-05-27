@@ -9,6 +9,7 @@ import com.github.tcurrie.rest.factory.proxy.ProxyFactory;
 import com.github.tcurrie.rest.factory.proxy.ProxyMethodHandler;
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import com.github.tcurrie.rest.factory.v1.RestMethodVerificationResult;
+import com.github.tcurrie.rest.factory.v1.TimeOut;
 import com.openpojo.random.RandomFactory;
 import com.openpojo.reflection.PojoMethod;
 import com.openpojo.reflection.impl.PojoMethodFactory;
@@ -23,18 +24,18 @@ public final class RestClientFactory {
         throw new RestFactoryException("Can not construct instance of Factory class.");
     }
 
-    public static <T> T create(final Class<T> service, final Supplier<String> urlSupplier) {
-        final T proxy = ProxyFactory.create(service, method -> create(service, urlSupplier, method));
+    public static <T> T create(final Class<T> service, final Supplier<String> urlSupplier, final Supplier<TimeOut> timeOutSupplier) {
+        final T proxy = ProxyFactory.create(service, method -> create(service, urlSupplier, timeOutSupplier, method));
         RestClientMonitorImpl.addHandler(proxy);
         return proxy;
     }
 
-    private static <T, U> RestClientMethod<U> create(final Class<T> service, final Supplier<String> urlSupplier, final Method method) {
+    private static <T, U> RestClientMethod<U> create(final Class<T> service, final Supplier<String> urlSupplier, final Supplier<TimeOut> timeOutSupplier, final Method method) {
         final RestUri methodUrlSupplier = RestUriFactory.getInstance().create(urlSupplier, service, method);
         final RestParameterAdaptor.Client methodArgs = RestParameterAdaptor.Client.Factory.create(method);
         final RestResponseAdaptor.Client<U> responseAdaptor = RestResponseAdaptor.Client.Factory.create(method);
         final EchoResponseAdaptor.Client echoAdaptor = EchoResponseAdaptor.Client.Factory.create(method);
-        return new RestClientMethod<>(method, methodUrlSupplier, methodArgs, responseAdaptor, echoAdaptor);
+        return new RestClientMethod<>(method, methodUrlSupplier, timeOutSupplier, methodArgs, responseAdaptor, echoAdaptor);
     }
 
     public static <T> Set<RestMethodVerificationResult> verify(final T client) {

@@ -1,12 +1,12 @@
 package com.github.tcurrie.rest.factory.client;
 
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.TimeOut;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 final class TimeBoxed {
@@ -14,12 +14,12 @@ final class TimeBoxed {
         throw new RestFactoryException("Can not construct instance of Factory class.");
     }
 
-    static <T> T attempt(final Supplier<T> work, final int timeout, final TimeUnit timeUnit) {
+    static <T> T attempt(final Supplier<T> work, final TimeOut timeout) {
         final ExecutorService executor = Executors.newSingleThreadExecutor();
         final Future<T> future = executor.submit(work::get);
         executor.shutdown();
         try {
-            return future.get(timeout, timeUnit);
+            return future.get(timeout.getTime(), timeout.getTimeUnit());
         } catch (final Exception e) {
             throw wrapWithRuntimeException(unwrapExecutionException(e));
         } finally {
@@ -42,4 +42,6 @@ final class TimeBoxed {
             return e;
         }
     }
+
+
 }

@@ -7,11 +7,11 @@ import com.github.tcurrie.rest.factory.client.HTTPExchange;
 import com.github.tcurrie.rest.factory.client.RestClientFactory;
 import com.github.tcurrie.rest.factory.it.apis.Pojo;
 import com.github.tcurrie.rest.factory.it.apis.PojoRandomGenerator;
-import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.github.tcurrie.rest.factory.it.impls.TestService;
 import com.github.tcurrie.rest.factory.v1.ResponseWrapper;
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import com.github.tcurrie.rest.factory.v1.RestMethodVerificationResult;
+import com.github.tcurrie.rest.factory.v1.TimeOut;
 import com.openpojo.random.RandomFactory;
 import com.openpojo.reflection.PojoField;
 import com.openpojo.reflection.impl.PojoClassFactory;
@@ -49,18 +49,16 @@ public class ConsumerIT {
     private static final PojoField CONNECTION_METHOD = PojoClassFactory.getPojoClass(HttpURLConnection.class).getPojoFields().stream().filter(f -> f.getName().equals("method")).findFirst().get();
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final TypeFactory TYPE_FACTORY = MAPPER.getTypeFactory();
-    private TestApi client;
 
     @Before
     public void before() {
         PojoRandomGenerator.create();
-        this.client = RestClientFactory.create(TestApi.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");
     }
 
     @Test
     public void testConsumesPojo() {
         final Pojo expected = RandomFactory.getRandomValue(Pojo.class);
-        client.consumer(expected);
+        TestClients.getValidTestApi().consumer(expected);
         assertThat(TestService.DATA.get("consumed"), is(expected));
     }
 
@@ -69,7 +67,7 @@ public class ConsumerIT {
         final Pojo unexpected = RandomFactory.getRandomValue(Pojo.class);
         TestService.DATA.put("consumed", RandomFactory.getRandomValue(Pojo.class));
         try {
-            RestClientFactory.create(TestApi.class, ()->"invalid").consumer(unexpected);
+            TestClients.getInvalidTestApi().consumer(unexpected);
             fail();
         } catch (final RestFactoryException e) {
             assertThat(e.getMessage(), startsWith("Failed to execute HTTPExchange, url[invalid/test-api/v1/consumer]"));
@@ -127,7 +125,7 @@ public class ConsumerIT {
 
     @Test
     public void testVerifiesClient() {
-        final Set<RestMethodVerificationResult> verified = RestClientFactory.verify(client);
+        final Set<RestMethodVerificationResult> verified = RestClientFactory.verify(TestClients.getValidTestApi());
         verified.forEach(m -> {
             Assert.assertThat(m.isSuccess(), is(true));
             Assert.assertArrayEquals(m.getArgs(), m.getResult());
@@ -177,7 +175,7 @@ public class ConsumerIT {
     private String exchange(final HTTPExchange.Method method, final Pojo expected) throws JsonProcessingException {
         final String methodUrl = RestServers.SERVER.getUrl() + "/generated-rest/test-api/v1/consumer";
         final String parameters = MAPPER.writeValueAsString(expected);
-        return HTTPExchange.execute(methodUrl, parameters, method, 30, TimeUnit.SECONDS);
+        return HTTPExchange.execute(methodUrl, parameters, method, TimeOut.create(30, TimeUnit.SECONDS));
     }
 
     private <T> ResponseWrapper<T> adaptResponse(final String body, final Class<T> type) throws IOException {

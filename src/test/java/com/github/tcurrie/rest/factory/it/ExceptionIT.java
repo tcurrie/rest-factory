@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import com.github.tcurrie.rest.factory.Strings;
 import com.github.tcurrie.rest.factory.client.HTTPExchange;
-import com.github.tcurrie.rest.factory.client.RestClientFactory;
 import com.github.tcurrie.rest.factory.it.apis.Pojo;
 import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.github.tcurrie.rest.factory.it.impls.TestService;
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.TimeOut;
 import com.openpojo.random.RandomFactory;
 import org.hamcrest.CoreMatchers;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -28,20 +27,13 @@ import static org.junit.Assert.fail;
 public class ExceptionIT {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private TestApi client;
-
-    @Before
-    public void before() {
-        this.client = RestClientFactory.create(TestApi.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");
-    }
-
     @Test
     public void testThrowsException() {
         final Exception expected = new IllegalStateException(RandomFactory.getRandomValue(String.class));
         TestService.DATA.put("exception", expected);
 
         try {
-            final int result = client.throwsException();
+            final int result = TestClients.getValidTestApi().throwsException();
             fail("Should have thrown exception, got[" + result  +"]");
         } catch (final Exception actual) {
             assertThat(actual, CoreMatchers.instanceOf(expected.getClass()));
@@ -57,7 +49,7 @@ public class ExceptionIT {
         TestService.DATA.put("runtimeException", expected);
 
         try {
-            final int result = client.throwsRuntimeException();
+            final int result = TestClients.getValidTestApi().throwsRuntimeException();
             fail("Should have thrown exception, got[" + result  +"]");
         } catch (final RuntimeException actual) {
             assertThat(actual, CoreMatchers.instanceOf(expected.getClass()));
@@ -83,7 +75,7 @@ public class ExceptionIT {
         }
 
         try {
-            final int result = client.throwsRuntimeException();
+            final int result = TestClients.getValidTestApi().throwsRuntimeException();
             fail("Should have thrown exception, got[" + result  +"]");
         } catch (final RestFactoryException actual) {
             assertThat(actual, CoreMatchers.instanceOf(expected.getClass()));
@@ -101,7 +93,7 @@ public class ExceptionIT {
         final String methodUrl = RestServers.SERVER.getUrl() + "/generated-rest/test-api/v1/unknown";
         final String parameters = MAPPER.writeValueAsString(expected);
 
-        final String result = HTTPExchange.execute(methodUrl, parameters, POST, 30, TimeUnit.SECONDS);
+        final String result = HTTPExchange.execute(methodUrl, parameters, POST, TimeOut.create(30, TimeUnit.SECONDS));
 
         try {
             RestResponseAdaptor.Client.Factory.create(method).apply(result);
@@ -119,7 +111,7 @@ public class ExceptionIT {
         final String methodUrl = RestServers.SERVER.getUrl() + "/generated-rest/test-api/v1/consumer";
         final String parameters = MAPPER.writeValueAsString("invalid");
 
-        final String result = HTTPExchange.execute(methodUrl, parameters, ECHO, 30, TimeUnit.SECONDS);
+        final String result = HTTPExchange.execute(methodUrl, parameters, ECHO, TimeOut.create(30, TimeUnit.SECONDS));
 
         try {
             RestResponseAdaptor.Client.Factory.create(method).apply(result);

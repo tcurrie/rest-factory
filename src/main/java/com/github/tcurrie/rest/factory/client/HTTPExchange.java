@@ -2,6 +2,7 @@ package com.github.tcurrie.rest.factory.client;
 
 import com.github.tcurrie.rest.factory.Strings;
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
+import com.github.tcurrie.rest.factory.v1.TimeOut;
 import com.openpojo.reflection.PojoField;
 import com.openpojo.reflection.impl.PojoClassFactory;
 
@@ -28,12 +29,12 @@ public final class HTTPExchange {
         GET, POST, PUT, DELETE, ECHO
     }
 
-    public static String execute(final String url, final String body, final Method method, final int timeout, final TimeUnit timeUnit) {
-        return TimeBoxed.attempt(() -> complete(url, body, method, convert(timeout, timeUnit)), timeout, timeUnit);
+    public static String execute(final String url, final String body, final Method method, final TimeOut timeout) {
+        return TimeBoxed.attempt(() -> complete(url, body, method, adapt(timeout)), timeout);
     }
 
-    private static int convert(final int timeout, final TimeUnit timeUnit) {
-        return (int) TimeUnit.MILLISECONDS.convert(timeout, timeUnit);
+    private static int adapt(final TimeOut timeout) {
+        return (int) TimeOut.convert(timeout, TimeUnit.MILLISECONDS).getTime();
     }
 
     private static String complete(final String url, final String body, final Method method, final int timeout) {

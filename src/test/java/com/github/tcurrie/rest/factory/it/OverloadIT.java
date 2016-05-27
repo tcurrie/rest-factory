@@ -1,6 +1,5 @@
 package com.github.tcurrie.rest.factory.it;
 
-import com.github.tcurrie.rest.factory.client.RestClientFactory;
 import com.github.tcurrie.rest.factory.it.apis.PojoRandomGenerator;
 import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.openpojo.random.RandomFactory;
@@ -19,7 +18,7 @@ public class OverloadIT {
     @Before
     public void before() {
         PojoRandomGenerator.create();
-        this.client = RestClientFactory.create(TestApi.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");
+        this.client = TestClients.getValidTestApi();
     }
 
     @Test

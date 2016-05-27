@@ -3,7 +3,6 @@ package com.github.tcurrie.rest.factory.it;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tcurrie.rest.factory.RestUriFactory;
-import com.github.tcurrie.rest.factory.client.RestClientFactory;
 import com.github.tcurrie.rest.factory.it.apis.Pojo;
 import com.github.tcurrie.rest.factory.it.apis.PojoRandomGenerator;
 import com.github.tcurrie.rest.factory.it.apis.TestApi;
@@ -42,7 +41,7 @@ public class ProducerIT {
     @Before
     public void before() {
         PojoRandomGenerator.create();
-        this.client = RestClientFactory.create(TestApi.class, URL_SUPPLIER);
+        this.client = TestClients.getValidTestApi();
     }
 
     @Test
@@ -55,21 +54,20 @@ public class ProducerIT {
 
     @Test
     public void testProducesVerificationResults() {
-        RestClientFactory.create(TestApi.class, URL_SUPPLIER);
-        RestClientFactory.create(TestApi.class, ()->"invalid");
-        RestClientFactory.create(RestClientMonitor.class, URL_SUPPLIER);
-
-        Function<Supplier<String>, Function<Method, String>> toSig =
+        final Function<Supplier<String>, Function<Method, String>> toSig =
                 s -> m -> RestUriFactory.getInstance().create(s, m.getDeclaringClass(), m).get()
                 + "\n" + m.toGenericString();
 
-        final Set<String> expected = Stream.concat(
-            Methods.TypeFactory.map(RestClientMonitor.class, m -> toSig.apply(URL_SUPPLIER).apply(m)),
-            Stream.of(URL_SUPPLIER, () -> "invalid").flatMap(s->
-                    Methods.TypeFactory.map(TestApi.class, m -> toSig.apply(s).apply(m)))
-        ).collect(Collectors.toSet());
+        final Stream<String> validTestApi = Methods.BeanFactory.map(TestClients.getValidTestApi(), t -> m -> toSig.apply(TestClients.URL_SUPPLIER).apply(m));
+        final Stream<String> invalidTestApi = Methods.BeanFactory.map(TestClients.getInvalidTestApi(), t -> m -> toSig.apply(TestClients.INVALID_URL_SUPPLIER).apply(m));
+        final Stream<String> restClientMethod = Methods.BeanFactory.map(TestClients.getRestClientMonitor(), t -> m -> toSig.apply(TestClients.URL_SUPPLIER).apply(m));
+        final Stream<String> restMethodDictionary = Methods.BeanFactory.map(TestClients.getRestMethodDictionary(), t -> m -> toSig.apply(TestClients.URL_SUPPLIER).apply(m));
 
-        final RestClientMonitor monitor = RestClientFactory.create(RestClientMonitor.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");
+        final Set<String> expected = Stream.concat(validTestApi, Stream.concat(invalidTestApi, Stream.concat(restClientMethod, restMethodDictionary)))
+                .filter(s->!s.contains("ProxyMethodHandler"))
+                .collect(Collectors.toSet());
+
+        final RestClientMonitor monitor = TestClients.getRestClientMonitor();
         final Set<RestMethodVerificationResult> actual = monitor.verifyClients();
         actual.stream().sorted((a, b)->a.getUrl().compareTo(b.getUrl())).forEach(t->{
             final String signature = t.getUrl() + "\n" + t.getApi();
@@ -92,10 +90,9 @@ public class ProducerIT {
                 RestMethod.class);
         final String expectedJson =
         "[{\"uri\":\"/test-api/v1/add\",\"method\":\"add\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/rest-client-monitor/v1/verify-clients\",\"method\":\"verifyClients\",\"bean\":\"com.github.tcurrie.rest.factory.v1.RestClientMonitor\"},{\"uri\":\"/rest-method-dictionary/v1/get-methods\",\"method\":\"getMethods\",\"bean\":\"com.github.tcurrie.rest.factory.v1.RestMethodDictionary\"},{\"uri\":\"/test-api/v1/throws-exception\",\"method\":\"throwsException\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/producer\",\"method\":\"producer\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/runnable\",\"method\":\"runnable\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/consumer\",\"method\":\"consumer\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/throws-runtime-exception\",\"method\":\"throwsRuntimeException\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/reverse\",\"method\":\"reverse\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/min\",\"method\":\"min\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/join\",\"method\":\"join\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/dedup\",\"method\":\"dedup\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/concatenate\",\"method\":\"concatenate\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/sum\",\"method\":\"sum\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"}]";
-        //"[{\"uri\":\"/test-api/v1/add\",\"method\":\"add\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/rest-client-monitor/v1/verify-clients\",\"method\":\"verifyClients\",\"bean\":\"com.github.tcurrie.rest.factory.v1.RestClientMonitor\"},{\"uri\":\"/rest-method-dictionary/v1/get-methods\",\"method\":\"getMethods\",\"bean\":\"com.github.tcurrie.rest.factory.v1.RestMethodDictionary\"},{\"uri\":\"/test-api/v1/throws-exception\",\"method\":\"throwsException\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/producer\",\"method\":\"producer\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/consumer\",\"method\":\"consumer\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/runnable\",\"method\":\"runnable\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/throws-runtime-exception\",\"method\":\"throwsRuntimeException\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/reverse\",\"method\":\"reverse\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/min\",\"method\":\"min\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/dedup\",\"method\":\"dedup\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/concatenate\",\"method\":\"concatenate\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"},{\"uri\":\"/test-api/v1/sum\",\"method\":\"sum\",\"bean\":\"com.github.tcurrie.rest.factory.it.apis.TestApi\"}]";
         final Set<RestMethod> expected = new ObjectMapper().readValue(expectedJson, type);
 
-        final RestMethodDictionary dictionary = RestClientFactory.create(RestMethodDictionary.class, ()->RestServers.SERVER.getUrl() + "/generated-rest");
+        final RestMethodDictionary dictionary = TestClients.getRestMethodDictionary();
         final Set<RestMethod> actual = dictionary.getMethods();
 
         assertThat(actual, is(expected));
