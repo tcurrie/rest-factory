@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tcurrie.rest.factory.RestUriFactory;
 import com.github.tcurrie.rest.factory.it.apis.Pojo;
 import com.github.tcurrie.rest.factory.it.apis.PojoRandomGenerator;
-import com.github.tcurrie.rest.factory.it.apis.TestApi;
 import com.github.tcurrie.rest.factory.it.impls.TestService;
 import com.github.tcurrie.rest.factory.proxy.Methods;
 import com.github.tcurrie.rest.factory.v1.RestClientMonitor;
@@ -35,20 +34,17 @@ import static org.junit.Assert.assertThat;
 
 public class ProducerIT {
 
-    private static final Supplier<String> URL_SUPPLIER = () -> RestServers.SERVER.getUrl() + "/generated-rest";
-    private TestApi client;
 
     @Before
     public void before() {
         PojoRandomGenerator.create();
-        this.client = TestClients.getValidTestApi();
     }
 
     @Test
     public void testProducesPojo() {
         final Pojo expected = RandomFactory.getRandomValue(Pojo.class);
         TestService.DATA.put("produce", expected);
-        final Pojo actual = client.producer();
+        final Pojo actual = TestClients.getValidTestApi().producer();
         assertThat(actual, is(expected));
     }
 

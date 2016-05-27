@@ -10,32 +10,32 @@ import com.github.tcurrie.rest.factory.v1.TimeOut;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-public class TestClients {
+class TestClients {
     private TestClients() {
         throw new RestFactoryException("Can not construct instance of Factory class.");
     }
 
-    public static final Supplier<String> URL_SUPPLIER = () -> RestServers.SERVER.getUrl() + "/generated-rest";
-    public static final Supplier<String> INVALID_URL_SUPPLIER = () -> "invalid";
+    static final Supplier<String> URL_SUPPLIER = () -> RestServers.SERVER.getUrl() + "/generated-rest";
+    static final Supplier<String> INVALID_URL_SUPPLIER = () -> "invalid";
     private static final Supplier<TimeOut> TIME_OUT_SUPPLIER = () -> TimeOut.create(30, TimeUnit.SECONDS);
     private static final TestApi VALID_TEST_API = RestClientFactory.create(TestApi.class, URL_SUPPLIER, TIME_OUT_SUPPLIER);
     private static final TestApi INVALID_TEST_API = RestClientFactory.create(TestApi.class, INVALID_URL_SUPPLIER, TIME_OUT_SUPPLIER);
     private static final RestClientMonitor REST_CLIENT_MONITOR = RestClientFactory.create(RestClientMonitor.class, URL_SUPPLIER, TIME_OUT_SUPPLIER);
     private static final RestMethodDictionary REST_METHOD_DICTIONARY = RestClientFactory.create(RestMethodDictionary.class, URL_SUPPLIER, TIME_OUT_SUPPLIER);
 
-    public static TestApi getValidTestApi() {
+    static TestApi getValidTestApi() {
         return VALID_TEST_API;
     }
 
-    public static TestApi getInvalidTestApi() {
+    static TestApi getInvalidTestApi() {
         return INVALID_TEST_API;
     }
 
-    public static RestClientMonitor getRestClientMonitor() {
+    static RestClientMonitor getRestClientMonitor() {
         return REST_CLIENT_MONITOR;
     }
 
-    public static RestMethodDictionary getRestMethodDictionary() {
+    static RestMethodDictionary getRestMethodDictionary() {
         return REST_METHOD_DICTIONARY;
     }
 }
