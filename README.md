@@ -9,7 +9,7 @@ On the service side:
 ```
 On the client side:
 ```java
-        final MyApi client = RestClientFactory.create(MyApi.class, ()->url);
+        final MyApi client = RestClientFactory.create(MyApi.class, ()->url, ()->timeout);
 ```
 **_Time for a coffee break!_**
 
