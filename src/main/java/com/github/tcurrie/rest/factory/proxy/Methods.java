@@ -12,16 +12,19 @@ public interface Methods {
     Method EQUALS = TypeFactory.get(Object.class, "equals", Object.class);
     Method HASH_CODE = TypeFactory.get(Object.class, "hashCode");
 
-    interface BeanFactory<U> extends Function<Class<?>, TypeFactory<U>> {
-        static <U> Stream<U> map(final Object bean, final BeanFactory<U> factory) {
-            return Arrays.stream(bean.getClass().getInterfaces()).flatMap(
-                    type -> TypeFactory.map(type, factory.apply(type)));
+    interface BeanFactory {
+        static Stream<Method> stream(final Object bean) {
+            return Arrays.stream(bean.getClass().getInterfaces()).flatMap(TypeFactory::stream);
+        }
+
+        static <T> Stream<T> map(final Object bean, Function<Class<?>, Function<Method, T>> function) {
+            return stream(bean).map(m -> function.apply(m.getDeclaringClass()).apply(m));
         }
     }
 
-    interface TypeFactory<U> extends Function<Method, U> {
-        static <U> Stream<U> map(final Class<?> type, final TypeFactory<U> factory) {
-            return Arrays.stream(type.getMethods()).map(factory);
+    interface TypeFactory {
+        static Stream<Method> stream(final Class<?> type) {
+            return Arrays.stream(type.getMethods());
         }
 
         static Method get(Class<?> type, String methodName, Class<?>... args) {

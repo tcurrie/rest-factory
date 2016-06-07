@@ -18,7 +18,7 @@ public class RestClientMonitorImpl implements RestClientMonitor {
 
     @SuppressWarnings("unchecked")
     static <T> void addHandler(final T handler) {
-        handlers.add((ProxyMethodHandler<RestClientMethod<?>>)handler);
+        handlers.add((ProxyMethodHandler<RestClientMethod<?>>) handler);
     }
 
     @Override

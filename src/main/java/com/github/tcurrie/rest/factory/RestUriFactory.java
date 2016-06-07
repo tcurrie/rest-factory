@@ -1,5 +1,7 @@
 package com.github.tcurrie.rest.factory;
 
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
+
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
@@ -15,7 +17,14 @@ public class RestUriFactory {
 
     public <T> RestUri create(final Supplier<String> urlSupplier, final Class<T> service, final Method method) {
         final String methodUri = create(service, method);
-        return RestUri.create(() -> removeSlash(urlSupplier.get()), methodUri);
+        return RestUri.create(() -> removeSlash(notNull(urlSupplier.get(), methodUri)), methodUri);
+    }
+
+    private String notNull(final String url, final String methodUri) {
+        if (url == null) {
+            throw new RestFactoryException(Strings.format("Invalid null url supplied for rest method [???{}]", methodUri));
+        }
+        return url;
     }
 
     String removeSlash(final String url) {

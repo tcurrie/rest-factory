@@ -1,5 +1,6 @@
 package com.github.tcurrie.rest.factory;
 
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import com.google.common.collect.ImmutableMap;
 import com.openpojo.random.RandomFactory;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import java.util.stream.IntStream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class RestUriFactoryTest {
 
@@ -76,6 +78,34 @@ public class RestUriFactoryTest {
         Mockito.verifyNoMoreInteractions(mockFactory);
 
         assertThat(actual, is(expected));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testRestFactoryExceptionThrownForNullUrl() throws NoSuchMethodException {
+        final String urlFixed = RandomFactory.getRandomValue(String.class);
+        final String uri = RandomFactory.getRandomValue(String.class);
+
+        final Supplier<String> urlSupplier = ()->null;
+        final Class type = RestUriFactoryTest.class;
+        final Method method = type.getMethod("before");
+
+        Mockito.doCallRealMethod().when(mockFactory).create(urlSupplier, type, method);
+        Mockito.when(mockFactory.create(type, method)).thenReturn(uri);
+        Mockito.when(mockFactory.removeSlash(null)).thenReturn(urlFixed);
+
+        final Supplier<String> result = mockFactory.create(urlSupplier, type, method);
+
+        Mockito.verify(mockFactory).create(urlSupplier, type, method);
+        Mockito.verify(mockFactory).create(type, method);
+        Mockito.verify(mockFactory, Mockito.never()).removeSlash(null);
+
+        try {
+            result.get();
+            fail("Should have thrown exception.");
+        } catch (final RestFactoryException e) {
+            assertThat(e.getMessage(), is("Invalid null url supplied for rest method [???" + uri + "]"));
+        }
     }
 
     @Test

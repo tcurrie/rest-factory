@@ -1,12 +1,12 @@
 package com.github.tcurrie.rest.factory.service;
 
 
-import com.github.tcurrie.rest.factory.proxy.MethodImplementation;
-import com.github.tcurrie.rest.factory.v1.RestFactoryException;
-import com.github.tcurrie.rest.factory.proxy.Methods;
 import com.github.tcurrie.rest.factory.RestParameterAdaptor;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import com.github.tcurrie.rest.factory.RestUriFactory;
+import com.github.tcurrie.rest.factory.proxy.MethodImplementation;
+import com.github.tcurrie.rest.factory.proxy.Methods;
+import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -22,7 +22,9 @@ final class RestMethodFactory {
     }
 
     static Stream<RestServiceMethod> create(final Object bean) {
-        return Methods.BeanFactory.map(bean, type -> (method -> create(bean, type, method)));
+        return Methods.BeanFactory.stream(bean)
+                .filter(method -> !method.getDeclaringClass().getCanonicalName().contains("org.springframework.aop"))
+                .map(method -> create(bean, method.getDeclaringClass(), method));
     }
 
     @SuppressWarnings("unchecked")

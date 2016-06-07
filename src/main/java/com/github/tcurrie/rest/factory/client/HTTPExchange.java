@@ -61,6 +61,7 @@ public final class HTTPExchange {
              */
             CONNECTION_METHOD.set(connection, method.name());
 
+            // TODO break this handler pattern out and make it so that server errors get error stream and anything else wraps the bad result in a unigue exception. (versus a null pointer)
             final InputStream is = connection.getResponseCode() == HttpServletResponse.SC_OK ? connection.getInputStream() : connection.getErrorStream();
 
             try (final BufferedReader in = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {

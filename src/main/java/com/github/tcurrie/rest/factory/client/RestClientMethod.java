@@ -62,12 +62,17 @@ class RestClientMethod<T> implements ProxyMethod<T> {
         return echoAdaptor;
     }
 
+    @SuppressWarnings("unused")
+    Supplier<TimeOut> getTimeOutSupplier() {
+        return timeOutSupplier;
+    }
+
     @Override
     public T invoke(final Object[] args) throws Throwable {
         final String url = methodUrlSupplier.get();
         final TimeOut timeout = timeOutSupplier.get();
         final String body = parameterAdaptor.apply(args);
-        LOGGER.debug("For method [{}] and args [{}], posting to [{}] with [{}] within [{}].", method, args, url, body, timeout);
+        LOGGER.debug("Invoke method [{}] and args [{}], posting to [{}] with [{}] within [{}].", method, args, url, body, timeout);
 
         final String response = HTTPExchange.execute(url, body, POST, timeout);
 
@@ -80,7 +85,7 @@ class RestClientMethod<T> implements ProxyMethod<T> {
         final String url = methodUrlSupplier.get();
         final TimeOut timeout = timeOutSupplier.get();
         final String body = parameterAdaptor.apply(args);
-        LOGGER.debug("For method [{}] and args [{}], echoing to [{}] with [{}] within [{}].", method, args, url, body, timeout);
+        LOGGER.debug("Echo method [{}] and args [{}], to [{}] with [{}] within [{}].", method, args, url, body, timeout);
         try {
             final String response = HTTPExchange.execute(url, body, ECHO, timeout);
             return echoAdaptor.apply(url, args, response);

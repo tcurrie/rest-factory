@@ -3,14 +3,15 @@ package com.github.tcurrie.rest.factory.it;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tcurrie.rest.factory.RestUriFactory;
+import com.github.tcurrie.rest.factory.client.RestClientFactory;
 import com.github.tcurrie.rest.factory.it.apis.Pojo;
 import com.github.tcurrie.rest.factory.it.apis.PojoRandomGenerator;
 import com.github.tcurrie.rest.factory.it.impls.TestService;
 import com.github.tcurrie.rest.factory.proxy.Methods;
-import com.github.tcurrie.rest.factory.v1.RestClientMonitor;
 import com.github.tcurrie.rest.factory.v1.RestMethod;
 import com.github.tcurrie.rest.factory.v1.RestMethodDictionary;
 import com.github.tcurrie.rest.factory.v1.RestMethodVerificationResult;
+import com.github.tcurrie.rest.factory.v1.TimeOut;
 import com.google.common.collect.Lists;
 import com.openpojo.random.RandomFactory;
 import org.hamcrest.CoreMatchers;
@@ -23,12 +24,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -63,19 +64,19 @@ public class ProducerIT {
                 .filter(s->!s.contains("ProxyMethodHandler"))
                 .collect(Collectors.toSet());
 
-        final RestClientMonitor monitor = TestClients.getRestClientMonitor();
-        final Set<RestMethodVerificationResult> actual = monitor.verifyClients();
+        final Set<RestMethodVerificationResult> actual = RestClientFactory.verify(TestClients.URL_SUPPLIER.get(), TimeOut.create(30, TimeUnit.SECONDS));
         actual.stream().sorted((a, b)->a.getUrl().compareTo(b.getUrl())).forEach(t->{
             final String signature = t.getUrl() + "\n" + t.getApi();
-            if (t.getUrl().startsWith("http")) {
-                assertThat(t.isSuccess(), is(true));
-                assertThat(t.getArgs(), is(t.getResult()));
-            } else {
-                assertThat(t.isSuccess(), is(false));
-                assertThat(t.getException(), CoreMatchers.notNullValue());
+            if (expected.contains(signature)) {
+                if (t.getUrl().startsWith("http")) {
+                    assertThat(t.isSuccess(), is(true));
+                    assertThat(t.getArgs(), is(t.getResult()));
+                } else {
+                    assertThat(t.isSuccess(), is(false));
+                    assertThat(t.getException(), CoreMatchers.notNullValue());
+                }
+                expected.remove(signature);
             }
-            assertThat(expected, hasItem(signature));
-            expected.remove(signature);
         });
         assertThat("Should have found [" + expected + "]", expected.size(), is(0));
     }

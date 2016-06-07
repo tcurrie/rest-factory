@@ -2,7 +2,9 @@ package com.github.tcurrie.rest.factory.proxy;
 
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.function.Function;
 
 public final class ProxyFactory {
     private ProxyFactory() {
@@ -10,8 +12,8 @@ public final class ProxyFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, U extends ProxyMethod<?>> T create(Class<T> type, final Methods.TypeFactory<U> factory) {
+    public static <T, U extends ProxyMethod<?>> T create(Class<T> type, final Function<Method, U> factory) {
         return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type, ProxyMethodHandler.class},
-                ProxyInvocationHandler.create(Methods.TypeFactory.map(type, factory)));
+                ProxyInvocationHandler.create(Methods.TypeFactory.stream(type).map(factory)));
     }
 }

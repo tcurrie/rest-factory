@@ -39,9 +39,8 @@ public class MethodsTest {
     @Test
     public void testStreamAllMethodsThroughFactory() {
         final Class<?> type = Foo.class;
-        final Set<String> expected = Stream.of("foo").collect(Collectors.toSet());
-        final Set<String> actual = Methods.TypeFactory.map(type, Method::getName).collect(Collectors.toSet());
-
+        final Set<String> expected = Stream.of("foo", "foobar").collect(Collectors.toSet());
+        final Set<String> actual = Methods.TypeFactory.stream(type).map(Method::getName).collect(Collectors.toSet());
         assertThat(actual, is(expected));
     }
 
@@ -54,21 +53,27 @@ public class MethodsTest {
             @Override
             public void bar() {
             }
+            @Override
+            public void foobar() {
+            }
         };
-        final Set<String> expected = Stream.of("FooBar.foo", "FooBar.bar").collect(Collectors.toSet());
-        final Set<String> actual = Methods.BeanFactory.map(bean, t -> m -> t.getSimpleName() + "." + m.getName()).collect(Collectors.toSet());
+        final Set<String> expected = Stream.of("Foo.foo", "Bar.bar", "FooBar.foobar").collect(Collectors.toSet());
+        final Set<String> actual = Methods.BeanFactory.stream(bean).map(m -> m.getDeclaringClass().getSimpleName() + "." + m.getName()).collect(Collectors.toSet());
 
         assertThat(actual, is(expected));
     }
 
+    @SuppressWarnings("unused")
     private interface Foo {
-        @SuppressWarnings("unused")
         void foo();
+        void foobar();
     }
+    @SuppressWarnings("unused")
     private interface Bar {
-        @SuppressWarnings("unused")
         void bar();
     }
+    @SuppressWarnings("unused")
     private interface FooBar extends Foo, Bar {
+        void foobar();
     }
 }

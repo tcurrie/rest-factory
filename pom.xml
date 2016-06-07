@@ -6,7 +6,7 @@
 
     <groupId>com.github.tcurrie</groupId>
     <artifactId>rest.factory</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2.68</version>
 
     <name>Simple Rest Factory</name>
     <description>Simple rest client-server factory, you give it a url, it does the rest!</description>

@@ -7,6 +7,7 @@ import com.github.tcurrie.rest.factory.RestUri;
 import com.github.tcurrie.rest.factory.RestUriFactory;
 import com.github.tcurrie.rest.factory.proxy.ProxyFactory;
 import com.github.tcurrie.rest.factory.proxy.ProxyMethodHandler;
+import com.github.tcurrie.rest.factory.v1.RestClientMonitor;
 import com.github.tcurrie.rest.factory.v1.RestFactoryException;
 import com.github.tcurrie.rest.factory.v1.RestMethodVerificationResult;
 import com.github.tcurrie.rest.factory.v1.TimeOut;
@@ -49,4 +50,25 @@ public final class RestClientFactory {
         final PojoMethod pm = PojoMethodFactory.getMethod(m.getDeclaringClass(), m.getName(), m.getParameterTypes());
         return pm.getPojoParameters().stream().map(RandomFactory::getRandomValue).toArray();
     }
+
+    @SuppressWarnings("WeakerAccess")
+    public static <T> Supplier<String> getUrlSupplier(final T client) {
+        @SuppressWarnings("unchecked")
+        final ProxyMethodHandler<RestClientMethod<?>> handler = (ProxyMethodHandler<RestClientMethod<?>>)client;
+        //noinspection OptionalGetWithoutIsPresent
+        return handler.getMethodHandlers().stream().map(m -> m.getMethodUrlSupplier().getUrlSupplier()).findFirst().get();
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public static <T> Supplier<TimeOut> getTimeoutSupplier(final T client) {
+        @SuppressWarnings("unchecked")
+        final ProxyMethodHandler<RestClientMethod<?>> handler = (ProxyMethodHandler<RestClientMethod<?>>)client;
+        //noinspection OptionalGetWithoutIsPresent
+        return handler.getMethodHandlers().stream().map(RestClientMethod::getTimeOutSupplier).findFirst().get();
+    }
+
+    public static Set<RestMethodVerificationResult> verify(final String url, final TimeOut timeOut) {
+        return create(RestClientMonitor.class, ()->url, ()->timeOut).verifyClients();
+    }
 }
+
