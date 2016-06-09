@@ -6,33 +6,29 @@ import com.openpojo.business.annotation.BusinessKey;
 public final class RestMethod {
     @BusinessKey
     private String uri;
-    private String method;
-    private String bean;
+    @BusinessKey
+    private String api;
 
-    public static RestMethod create(final String uri, final String method, final String bean) {
-        return new RestMethod(uri, method, bean);
+    public static RestMethod create(final String uri, final String api) {
+        return new RestMethod(uri, api);
     }
 
     @SuppressWarnings("unused")
     private RestMethod() {}
 
-    private RestMethod(final String uri, final String method, final String bean) {
+    private RestMethod(final String uri, final String api) {
         this.uri = uri;
-        this.method = method;
-        this.bean = bean;
+        this.api = api;
     }
 
     public String getUri() {
         return uri;
     }
 
-    public String getMethod() {
-        return method;
+    public String getApi() {
+        return api;
     }
 
-    public String getBean() {
-        return bean;
-    }
 
     @Override
     public int hashCode() {

@@ -20,12 +20,12 @@
 
     <!-- Generated Rest servlet -->
     <servlet>
-        <servlet-name>generated-rest</servlet-name>
+        <servlet-name>blah</servlet-name>
         <servlet-class>com.github.tcurrie.rest.factory.service.GeneratedRestService</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <servlet-name>generated-rest</servlet-name>
+        <servlet-name>blah</servlet-name>
         <url-pattern>/generated-rest/*</url-pattern>
     </servlet-mapping>
 

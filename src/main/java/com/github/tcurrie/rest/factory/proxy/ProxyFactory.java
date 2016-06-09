@@ -12,8 +12,8 @@ public final class ProxyFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T, U extends ProxyMethod<?>> T create(Class<T> type, final Function<Method, U> factory) {
-        return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type, ProxyMethodHandler.class},
+    public static <T, U extends ProxyMethod<?>, V extends ProxyMethodHandler<U>> T create(Class<T> type, Class<V> proxyType, final Function<Method, U> factory) {
+        return (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[]{type, proxyType},
                 ProxyInvocationHandler.create(Methods.TypeFactory.stream(type).map(factory)));
     }
 }

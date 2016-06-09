@@ -36,12 +36,8 @@ public final class MethodImplementation<T, U> implements Comparable<MethodImplem
         }
     }
 
-    public String getMethodName() {
-        return method.getName();
-    }
-
-    public String getBeanName() {
-        return method.getDeclaringClass().getCanonicalName();
+    public String getApi() {
+        return method.toGenericString();
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")

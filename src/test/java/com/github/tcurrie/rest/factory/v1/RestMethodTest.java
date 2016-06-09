@@ -30,7 +30,7 @@ public class RestMethodTest {
 
     @Test
     public void testToString() {
-        final RestMethod restMethod = RestMethod.create(RandomFactory.getRandomValue(String.class), RandomFactory.getRandomValue(String.class), RandomFactory.getRandomValue(String.class));
+        final RestMethod restMethod = RestMethod.create(RandomFactory.getRandomValue(String.class), RandomFactory.getRandomValue(String.class));
         assertThat(restMethod.toString(), is(BusinessIdentity.toString(restMethod)));
     }
 }

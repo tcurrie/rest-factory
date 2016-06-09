@@ -11,15 +11,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 final class UriSetRestHandlerDictionary implements RequestDelegate {
     private static final Logger LOGGER = LoggerFactory.getLogger(UriSetRestHandlerDictionary.class);
-    private static final Function<RestServiceMethod, RestMethod> METHOD_TO_DESCRIPTION = h -> RestMethod.create(h.getUri(),
-            h.getImplementation().getMethodName(), h.getImplementation().getBeanName());
     private final Set<RestServiceMethod> handlers;
+    private final ThreadLocal<String> servletUrl;
 
     static UriSetRestHandlerDictionary create(final Stream<RestServiceMethod> handlers) {
         final UriSetRestHandlerDictionary d = new UriSetRestHandlerDictionary();
@@ -30,24 +28,32 @@ final class UriSetRestHandlerDictionary implements RequestDelegate {
             }
             d.handlers.add(h);
         });
-        d.handlers.addAll(RestMethodFactory.create((RestMethodDictionary) () ->
-                d.handlers.stream().map(METHOD_TO_DESCRIPTION).collect(Collectors.toSet()))
-                .collect(Collectors.toSet()));
+        d.handlers.addAll(RestMethodFactory.create((RestMethodDictionary) d::getHandlerDescription).collect(Collectors.toSet()));
         return d;
     }
 
     private UriSetRestHandlerDictionary() {
         //noinspection unchecked
         this.handlers = new TreeSet<>((a, b)->a.getImplementation().compareTo(b.getImplementation()));
+        this.servletUrl = new ThreadLocal<>();
+    }
+
+    private Set<RestMethod> getHandlerDescription() {
+        return handlers.stream().map(h -> RestMethod.create(servletUrl.get() + h.getUri(), h.getImplementation().getApi())).collect(Collectors.toSet());
     }
 
     @Override
     public List<RestServiceMethod> getHandlers(final HttpServletRequest req) {
         final String uri = req.getRequestURI();
+
+        String servletUri = req.getContextPath() + req.getServletPath();
+        String servletURL = req.getRequestURL().substring(0, req.getRequestURL().indexOf(servletUri) + servletUri.length());
+        this.servletUrl.set(servletURL);
+
         final List<RestServiceMethod> handler = find(uri);
         if (handler.size() == 0) {
             LOGGER.warn("Failed to match request [{}] to any Handler from [{}]", req.getRequestURI(), handlers);
-            throw new RestFactoryException(Strings.format("Failed to match request [{}] to any Handler from [{}]", req.getRequestURI(), handlers));
+            throw new RestFactoryException(Strings.format("Failed to match request [{}] to any Handler from [{}]", req.getRequestURI(), getHandlerDescription()));
         }
         return handler;
     }
