@@ -1,12 +1,16 @@
 package com.github.tcurrie.rest.factory.client;
 
+import static org.junit.Assert.assertThat;
+
+import java.util.Collection;
+
+import com.github.tcurrie.rest.factory.MethodRandomGenerator;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import com.github.tcurrie.rest.factory.RestUri;
 import com.google.common.collect.Lists;
 import com.openpojo.business.BusinessIdentity;
 import com.openpojo.random.ParameterizableRandomGenerator;
 import com.openpojo.random.RandomFactory;
-import com.openpojo.random.RandomGenerator;
 import com.openpojo.reflection.Parameterizable;
 import com.openpojo.reflection.impl.ParameterizableFactory;
 import com.openpojo.reflection.impl.PojoClassFactory;
@@ -20,29 +24,11 @@ import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Random;
-
-import static org.junit.Assert.assertThat;
-
 public class RestClientMethodTest {
 
     @BeforeClass
     public static void beforeClass() {
-        RandomFactory.addRandomGenerator(new RandomGenerator() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public Collection<Class<?>> getTypes() {
-                return Arrays.asList(new Class[]{Method.class});
-            }
-
-            @Override
-            public Object doGenerate(final Class<?> type) {
-                return getClass().getMethods()[new Random().nextInt(getClass().getMethods().length)];
-            }
-        });
+        MethodRandomGenerator.create();
         RandomFactory.addRandomGenerator(new ParameterizableRandomGenerator() {
             @Override
             public Collection<Class<?>> getTypes() {
@@ -64,7 +50,7 @@ public class RestClientMethodTest {
 
 
     @Test
-    public void testStructure() throws NoSuchMethodException {
+    public void testStructure() {
         final Validator validator = ValidatorBuilder.create()
                 .with(new BusinessKeyMustExistRule())
                 .with(new GetterTester())

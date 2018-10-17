@@ -1,5 +1,15 @@
 package com.github.tcurrie.rest.factory.proxy;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
+
+import java.lang.reflect.Method;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.github.tcurrie.rest.factory.MethodRandomGenerator;
 import com.openpojo.business.BusinessIdentity;
 import com.openpojo.business.annotation.BusinessKey;
 import com.openpojo.random.RandomFactory;
@@ -12,20 +22,18 @@ import com.openpojo.validation.rule.impl.BusinessKeyMustExistRule;
 import com.openpojo.validation.test.impl.BusinessIdentityTester;
 import com.openpojo.validation.test.impl.GetterTester;
 import com.openpojo.validation.test.impl.SetterTester;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.Method;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
-
 public class MethodImplementationTest {
+    @Before
+    public void before() {
+        MethodRandomGenerator.create();
+    }
+
+
     @Test
-    public void testStructure() throws NoSuchMethodException {
+    public void testStructure() {
         final Validator validator = ValidatorBuilder.create()
                 .with(new BusinessKeyMustExistRule())
                 .with(new GetterTester())

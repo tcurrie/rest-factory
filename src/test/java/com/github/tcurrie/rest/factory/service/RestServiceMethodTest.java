@@ -1,12 +1,18 @@
 package com.github.tcurrie.rest.factory.service;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.Collection;
+import java.util.Random;
+
+import com.github.tcurrie.rest.factory.MethodRandomGenerator;
 import com.github.tcurrie.rest.factory.RestResponseAdaptor;
 import com.github.tcurrie.rest.factory.proxy.MethodImplementation;
 import com.google.common.collect.Lists;
 import com.openpojo.business.BusinessIdentity;
 import com.openpojo.random.ParameterizableRandomGenerator;
 import com.openpojo.random.RandomFactory;
-import com.openpojo.random.RandomGenerator;
 import com.openpojo.reflection.Parameterizable;
 import com.openpojo.reflection.impl.ParameterizableFactory;
 import com.openpojo.reflection.impl.PojoClassFactory;
@@ -21,17 +27,9 @@ import com.openpojo.validation.test.impl.SetterTester;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Random;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 public class RestServiceMethodTest {
     @Test
-    public void testStructure() throws NoSuchMethodException {
+    public void testStructure() {
         final Validator validator = ValidatorBuilder.create()
                 .with(new GetterMustExistRule())
                 .with(new SetterMustExistRule())
@@ -50,19 +48,8 @@ public class RestServiceMethodTest {
     }
 
     @BeforeClass
-    public static void initialize() throws NoSuchMethodException {
-        RandomFactory.addRandomGenerator(new RandomGenerator() {
-            @SuppressWarnings("unchecked")
-            @Override
-            public Collection<Class<?>> getTypes() {
-                return Arrays.asList(new Class[]{Method.class});
-            }
-
-            @Override
-            public Object doGenerate(final Class<?> type) {
-                return getClass().getMethods()[new Random().nextInt(getClass().getMethods().length)];
-            }
-        });
+    public static void initialize() {
+        MethodRandomGenerator.create();
         RandomFactory.addRandomGenerator(new ParameterizableRandomGenerator() {
             @Override
             public Collection<Class<?>> getTypes() {

@@ -1,5 +1,10 @@
 package com.github.tcurrie.rest.factory;
 
+import static org.junit.Assert.assertThat;
+
+import java.util.Collection;
+import java.util.function.Supplier;
+
 import com.google.common.collect.Lists;
 import com.openpojo.business.BusinessIdentity;
 import com.openpojo.random.ParameterizableRandomGenerator;
@@ -20,12 +25,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Collection;
-import java.util.function.Supplier;
-
-import static org.junit.Assert.assertThat;
-
 public class RestUriTest {
+
     @BeforeClass
     public static void beforeClass() {
         RandomFactory.addRandomGenerator(new RandomGenerator() {
@@ -63,7 +64,7 @@ public class RestUriTest {
     }
 
     @Test
-    public void testStructure() throws NoSuchMethodException {
+    public void testStructure() {
         final Validator validator = ValidatorBuilder.create()
                 .with(new GetterMustExistRule())
                 .with(new SetterMustExistRule())
